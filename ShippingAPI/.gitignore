@@ -1,0 +1,33 @@
+﻿# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build results
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+
+# ASP.NET Core secrets
+appsettings.Development.json
+appsettings.Local.json
+
+# Test results
+TestResults/
+
+# Coverage reports
+coverage/
+*.coverage
+*.coveragexml
+
+# User-specific files
+*.vsp
+*.vspx
+*.userprefs
+
+# Git merge conflict files
+*.orig
