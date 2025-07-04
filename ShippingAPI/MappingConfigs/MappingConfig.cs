@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using ShippingAPI.DTOS;
 using ShippingAPI.DTOS.CustomPriceDTOs;
 using ShippingAPI.DTOS.OrderDTOs;
 using ShippingAPI.DTOS.OrderItemDTOs;
 using ShippingAPI.DTOS.Permissions;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
+using ShippingAPI.DTOS.Saves;
 using ShippingAPI.DTOS.ShippingTypeDTOs;
 using ShippingAPI.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -42,6 +44,23 @@ namespace ShippingAPI.MappingConfigs
 
                 }
                 ).ReverseMap();
+
+            // Bank Mapping
+            CreateMap<Bank, BankDTO>()
+                 .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch != null ? src.Branch.Name : string.Empty));
+
+            CreateMap<BankDTO, Bank>()
+                .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.BranchId))
+                .ForMember(dest => dest.Branch, opt => opt.Ignore());
+
+            // Safe Mapping
+            CreateMap<Safe, SavesDto>()
+                 .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch != null ? src.Branch.Name : string.Empty));
+
+            CreateMap<SavesDto, Safe>()
+                .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.BranchId))
+                .ForMember(dest => dest.Branch, opt => opt.Ignore());
+
             // OrderItem Mapping
             CreateMap<OrderItem, addOrderItemDTO>().ReverseMap();
             CreateMap<OrderItem, displayOrderItemDTO>().ReverseMap();
