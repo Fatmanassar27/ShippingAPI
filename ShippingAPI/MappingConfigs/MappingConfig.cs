@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ShippingAPI.DTOS;
 using ShippingAPI.DTOS.CustomPriceDTOs;
+using ShippingAPI.DTOS.FinancialTransferDtOs;
 using ShippingAPI.DTOS.OrderDTOs;
 using ShippingAPI.DTOS.OrderItemDTOs;
 using ShippingAPI.DTOS.Permissions;
@@ -18,7 +19,7 @@ namespace ShippingAPI.MappingConfigs
         public MappingConfig()
         {
             // CustomPrice Mapping
-            CreateMap<CustomPrice,addCustomPriceDTO>().ReverseMap();
+            CreateMap<CustomPrice, addCustomPriceDTO>().ReverseMap();
             CreateMap<CustomPrice, displayCustomPriceDTO>().AfterMap(
                 (src, dest) =>
                 {
@@ -32,7 +33,7 @@ namespace ShippingAPI.MappingConfigs
 
             // Order Mapping
             CreateMap<Order, addOrderDTO>().ReverseMap();
-            CreateMap<Order , displayOrderDTO>().AfterMap(
+            CreateMap<Order, displayOrderDTO>().AfterMap(
                 (src, dest) =>
                 {
                     dest.BranchName = src.Branch.Name;
@@ -65,18 +66,38 @@ namespace ShippingAPI.MappingConfigs
             CreateMap<OrderItem, addOrderItemDTO>().ReverseMap();
             CreateMap<OrderItem, displayOrderItemDTO>().ReverseMap();
             CreateMap<ApplicationUser, UserProfileDTO>()
-      .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
-      .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-      .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-      .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
             CreateMap<Permission, PermissionDto>().ReverseMap();
             CreateMap<ActionType, ActionTypeDto>().ReverseMap();
             CreateMap<PermissionAction, PermissionActionDto>().ReverseMap();
             CreateMap<RegisterDTO, ApplicationUser>()
-        .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
-        .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-        .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-        .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+
+            // FinancialTransfer Mapping
+            CreateMap<FinancialTransferDto, FinancialTransfer>();
+
+            CreateMap<FinancialTransfer, FinancialTransferViewDto>()
+            .ForMember(dest => dest.SourceName, opt => opt.MapFrom(src => src.SourceBank != null ? src.SourceBank.Name : src.SourceSafe != null ? src.SourceSafe.Name : null))
+            .ForMember(dest => dest.DestinationName, opt => opt.MapFrom(src => src.DestinationBank != null ? src.DestinationBank.Name :  src.DestinationSafe != null ? src.DestinationSafe.Name : null))
+            .ForMember(dest => dest.AdminName, opt => opt.MapFrom(src =>  src.Admin != null ? src.Admin.UserName : null));
+
+            CreateMap<FinancialTransfer, BankTransactionReportDto>()
+           .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.SourceBank != null ? src.SourceBank.Name : src.DestinationBank != null ? src.DestinationBank.Name : string.Empty))
+           .ForMember(dest => dest.Credit, opt => opt.MapFrom(src => src.DestinationBankId != null ? src.Amount : 0))
+           .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceBankId != null ? src.Amount : 0));
+
+            CreateMap<FinancialTransfer, SafeTransactionReportDto>()
+                .ForMember(dest => dest.SafeName, opt => opt.MapFrom(src => src.SourceSafe != null ? src.SourceSafe.Name : src.DestinationSafe != null ? src.DestinationSafe.Name : string.Empty))
+                .ForMember(dest => dest.Credit, opt => opt.MapFrom(src => src.DestinationSafeId != null ? src.Amount : 0))
+                .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceSafeId != null ? src.Amount : 0));
+
         }
+
     }
 }

@@ -8,19 +8,14 @@ namespace ShippingAPI.Models
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey("SourceBank")]
-        public int? SourceId { get; set; }
+        // source
+        public int? SourceBankId { get; set; }
+        public int? SourceSafeId { get; set; }
 
-        [Required]
-        [StringLength(20)]
-        public string SourceType { get; set; } = string.Empty;
-
-        [ForeignKey("DestinationBank")]
-        public int? DestinationId { get; set; }
-
-        [Required]
-        [StringLength(20)]
-        public string DestinationType { get; set; } = string.Empty;
+        //destination
+        public int? DestinationBankId { get; set; }
+        public int? DestinationSafeId { get; set; }
+        public string? AdminId { get; set; }
 
         [Column(TypeName = "Money")]
         public decimal Amount { get; set; }
@@ -30,10 +25,20 @@ namespace ShippingAPI.Models
         [StringLength(500)]
         public string? Note { get; set; }
 
+        //Navigation Properties
+        [ForeignKey(nameof(AdminId))]
+        public virtual ApplicationUser? Admin { get; set; }
+
+        [ForeignKey(nameof(SourceBankId))]
         public virtual Bank? SourceBank { get; set; }
+
+        [ForeignKey(nameof(SourceSafeId))]
+        public virtual Safe? SourceSafe { get; set; }
+
+        [ForeignKey(nameof(DestinationBankId))]
         public virtual Bank? DestinationBank { get; set; }
 
-        public virtual Safe? SourceSafe { get; set; }
+        [ForeignKey(nameof(DestinationSafeId))]
         public virtual Safe? DestinationSafe { get; set; }
     }
 }
