@@ -8,5 +8,9 @@ namespace ShippingAPI.Repositories
         public BranchRepo(ShippingContext db) : base(db)
         {
         }
+        public Branch? getByName(string name)
+        {
+            return db.Branches.FirstOrDefault(b => b.Name.ToLower() == name.ToLower());
+        }
     }
 }
