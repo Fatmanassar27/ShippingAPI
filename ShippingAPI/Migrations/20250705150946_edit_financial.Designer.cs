@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShippingAPI.Data;
 
@@ -11,9 +12,11 @@ using ShippingAPI.Data;
 namespace ShippingAPI.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    partial class ShippingContextModelSnapshot : ModelSnapshot
+    [Migration("20250705150946_edit_financial")]
+    partial class edit_financial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -574,9 +577,6 @@ namespace ShippingAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdminId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<decimal>("Amount")
                         .HasColumnType("Money");
 
@@ -600,8 +600,6 @@ namespace ShippingAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AdminId");
 
                     b.HasIndex("DestinationBankId");
 
@@ -1167,10 +1165,6 @@ namespace ShippingAPI.Migrations
 
             modelBuilder.Entity("ShippingAPI.Models.FinancialTransfer", b =>
                 {
-                    b.HasOne("ShippingAPI.Models.ApplicationUser", "Admin")
-                        .WithMany()
-                        .HasForeignKey("AdminId");
-
                     b.HasOne("ShippingAPI.Models.Bank", "DestinationBank")
                         .WithMany("DestinationTransfers")
                         .HasForeignKey("DestinationBankId");
@@ -1186,8 +1180,6 @@ namespace ShippingAPI.Migrations
                     b.HasOne("ShippingAPI.Models.Safe", "SourceSafe")
                         .WithMany("SourceTransfers")
                         .HasForeignKey("SourceSafeId");
-
-                    b.Navigation("Admin");
 
                     b.Navigation("DestinationBank");
 
