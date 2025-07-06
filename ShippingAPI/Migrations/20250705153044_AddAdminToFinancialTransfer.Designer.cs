@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShippingAPI.Data;
 
@@ -11,9 +12,11 @@ using ShippingAPI.Data;
 namespace ShippingAPI.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    partial class ShippingContextModelSnapshot : ModelSnapshot
+    [Migration("20250705153044_AddAdminToFinancialTransfer")]
+    partial class AddAdminToFinancialTransfer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -649,6 +652,9 @@ namespace ShippingAPI.Migrations
                     b.Property<string>("CourierId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("CourierProfileUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -672,9 +678,6 @@ namespace ShippingAPI.Migrations
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("OrderCost")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PaymentType")
                         .HasColumnType("int");
@@ -716,6 +719,8 @@ namespace ShippingAPI.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("CourierId");
+
+                    b.HasIndex("CourierProfileUserId");
 
                     b.HasIndex("GovernorateId");
 
@@ -1208,9 +1213,13 @@ namespace ShippingAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ShippingAPI.Models.CourierProfile", "CourierProfile")
-                        .WithMany("Orders")
+                    b.HasOne("ShippingAPI.Models.TraderProfile", "CourierProfile")
+                        .WithMany()
                         .HasForeignKey("CourierId");
+
+                    b.HasOne("ShippingAPI.Models.CourierProfile", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("CourierProfileUserId");
 
                     b.HasOne("ShippingAPI.Models.Governorate", "Governorate")
                         .WithMany()
