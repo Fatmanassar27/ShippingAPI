@@ -5,8 +5,11 @@ namespace ShippingAPI.Repositories
 {
     public class CityRepo : GenericRepo<City>
     {
-        public CityRepo(ShippingContext db) : base(db)
+        public CityRepo(ShippingContext db) : base(db){}
+
+        public City getByName(string name)
         {
+            return db.Cities.FirstOrDefault(c => c.Name.Contains(name));
         }
     }
 }

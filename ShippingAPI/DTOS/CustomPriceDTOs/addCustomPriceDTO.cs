@@ -9,7 +9,7 @@ namespace ShippingAPI.DTOS.CustomPriceDTOs
         [Column(TypeName = "Money")]
         public decimal Price { get; set; }
 
-        public string UserId { get; set; }
+        public string TraderId { get; set; }
 
         public int  CityId { get; set; }
 

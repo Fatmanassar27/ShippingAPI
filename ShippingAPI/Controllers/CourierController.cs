@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.courier;
@@ -14,12 +15,14 @@ namespace ShippingAPI.Controllers
         private readonly UserManager<ApplicationUser> usermanger;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UnitOfWork uow;
+        private readonly IMapper mapper;
 
-        public CourierController(UserManager<ApplicationUser> usermanger, RoleManager<IdentityRole> roleManager, UnitOfWork uow)
+        public CourierController(UserManager<ApplicationUser> usermanger, RoleManager<IdentityRole> roleManager, UnitOfWork uow, IMapper mapper)
         {
             this.usermanger = usermanger;
             this.roleManager = roleManager;
             this.uow = uow;
+            this.mapper = mapper;
         }
 
         [HttpPost("create")]
@@ -108,18 +111,20 @@ namespace ShippingAPI.Controllers
         [HttpGet("getcouriers")]
         public IActionResult GetCouriers()
         {
-            var couriers = uow.CourierProfileRepo.getAll();
+            var couriers = uow.CourierProfileRepo.getAllWithUser();
             if (couriers == null || !couriers.Any())
             {
                 return NotFound("There Are No Couriers!");
             }
-            return Ok(couriers);
+            var courierDtos = mapper.Map<List<CreateCourierDTO>>(couriers); 
+            return Ok(courierDtos);
+            //return Ok(couriers);
         }
 
         [HttpGet("getcourierbyid/{id:int}")]
-        public IActionResult GetCourierById(int id)
+        public IActionResult GetCourierById(string id)
         {
-            var courier = uow.CourierProfileRepo.getById(id);
+            var courier = uow.CourierProfileRepo.getByIdWithUser(id);
             if (courier == null)
             {
                 return NotFound("The Courier Is Not Found");
@@ -134,7 +139,9 @@ namespace ShippingAPI.Controllers
             {
                 return NotFound("The Courier Is Not Found");
             }
-            return Ok(courier);
+            //return Ok(courier);
+            var courierDto = mapper.Map<CreateCourierDTO>(courier); 
+            return Ok(courierDto);
         }
         [HttpPut]
         public IActionResult UpdateCourier([FromBody] CreateCourierDTO courierdto)

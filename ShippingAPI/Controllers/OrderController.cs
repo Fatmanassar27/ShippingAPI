@@ -20,10 +20,10 @@ namespace ShippingAPI.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet("getAllOrders")]
         public IActionResult getAllOrders()
         {
-            var orders = unit.OrderRepo.getAll();
+            var orders = unit.OrderRepo.getAllWithObj();
             if (orders == null || !orders.Any())
             {
                 return NotFound("No Orders Founded");
@@ -53,6 +53,7 @@ namespace ShippingAPI.Controllers
                 return BadRequest("Invalid Order data");
             }
             var order = mapper.Map<Order>(orderDTO);
+            order.TotalCost = unit.OrderRepo.CalculateTotalCost(order);
             unit.OrderRepo.add(order);
             unit.save();
             displayOrderDTO result = mapper.Map<displayOrderDTO>(unit.OrderRepo.getByIdWithObj(order.Id));
@@ -103,7 +104,7 @@ namespace ShippingAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("getByBranch/{branchId}")]
+        [HttpGet("getByBranchId/{branchId}")]
         public IActionResult getOrdersByBranch(int branchId)
         {
             var orders = unit.OrderRepo.getAllByBranchId(branchId);

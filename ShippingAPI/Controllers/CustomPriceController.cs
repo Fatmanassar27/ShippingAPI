@@ -44,6 +44,54 @@ namespace ShippingAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("byTraderId/{traderId}")]
+        public IActionResult getCustomPricesByTraderId(string traderId)
+        {
+            if (string.IsNullOrEmpty(traderId))
+            {
+                return BadRequest("Trader ID cannot be null or empty.");
+            }
+            var customPrices = unit.CustomPriceRepo.getByTraderId(traderId);
+            if (customPrices == null || !customPrices.Any())
+            {
+                return NotFound($"No custom prices found for trader with ID {traderId}.");
+            }
+            List<displayCustomPriceDTO> result = mapper.Map<List<displayCustomPriceDTO>>(customPrices);
+            return Ok(result);
+        }
+
+        [HttpGet("byCityId/{cityId}")]
+        public IActionResult getCustomPricesByCityId(int cityId)
+        {
+            if (cityId <= 0)
+            {
+                return BadRequest("Invalid city ID.");
+            }
+            var customPrices = unit.CustomPriceRepo.getByCityId(cityId);
+            if (customPrices == null || !customPrices.Any())
+            {
+                return NotFound($"No custom prices found for city with ID {cityId}.");
+            }
+            List<displayCustomPriceDTO> result = mapper.Map<List<displayCustomPriceDTO>>(customPrices);
+            return Ok(result);
+        }
+
+        [HttpGet("byCityName/{cityName}")]
+        public IActionResult getCustomPricesByCityName(string cityName)
+        {
+            if (string.IsNullOrEmpty(cityName))
+            {
+                return BadRequest("City name cannot be null or empty.");
+            }
+            var customPrices = unit.CustomPriceRepo.getByCityName(cityName);
+            if (customPrices == null || !customPrices.Any())
+            {
+                return NotFound($"No custom prices found for city with name {cityName}.");
+            }
+            List<displayCustomPriceDTO> result = mapper.Map<List<displayCustomPriceDTO>>(customPrices);
+            return Ok(result);
+        }
+
         [HttpPost]
         public IActionResult addCustomPrice(addCustomPriceDTO customPriceDto)
         {

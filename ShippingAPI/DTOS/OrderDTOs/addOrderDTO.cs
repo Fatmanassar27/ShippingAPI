@@ -15,7 +15,7 @@ namespace ShippingAPI.DTOS.OrderDTOs
         public bool DeliverToVillage { get; set; } = false;
         public PaymentType PaymentType { get; set; } = PaymentType.Prepaid;
         public double TotalWeight { get; set; }
-        public decimal TotalCost { get; set; }
+        public decimal OrderCost { get; set; }
         public string Notes { get; set; }
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
         public DateTime CreatedAt { get; set; } = DateTime.Now;

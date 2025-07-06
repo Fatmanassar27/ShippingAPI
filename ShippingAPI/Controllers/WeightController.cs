@@ -20,7 +20,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllWeights()
+        public IActionResult getAllWeights()
         {
             var weights = unit.WeightRepo.getAll();
             if (weights == null || !weights.Any())
@@ -44,18 +44,40 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost]
-        public IActionResult addeWeight(addWeightDTO weightDto)
+        public IActionResult addWeight(addWeightDTO weightDto)
         {
             if (weightDto == null)
             {
                 return BadRequest("Weight data is null.");
             }
+
+            var existingWeights = unit.WeightRepo.getAll();
+            if (existingWeights.Any())
+            {
+                return BadRequest("Only one weight is allowed. Please update the existing one.");
+            }
+
             var weight = mapper.Map<Weight>(weightDto);
             unit.WeightRepo.add(weight);
             unit.save();
             displayWeightDTO result = mapper.Map<displayWeightDTO>(weight);
             return Ok(result);
         }
+
+
+        //[HttpPost]
+        //public IActionResult addeWeight(addWeightDTO weightDto)
+        //{
+        //    if (weightDto == null)
+        //    {
+        //        return BadRequest("Weight data is null.");
+        //    }
+        //    var weight = mapper.Map<Weight>(weightDto);
+        //    unit.WeightRepo.add(weight);
+        //    unit.save();
+        //    displayWeightDTO result = mapper.Map<displayWeightDTO>(weight);
+        //    return Ok(result);
+        //}
 
         [HttpPut("{id}")]
         public IActionResult updateWeight(int id, addWeightDTO weightDto)
