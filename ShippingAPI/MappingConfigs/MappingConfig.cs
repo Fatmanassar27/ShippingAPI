@@ -28,7 +28,7 @@ namespace ShippingAPI.MappingConfigs
             CreateMap<CustomPrice, displayCustomPriceDTO>().AfterMap(
                 (src, dest) =>
                 {
-                    dest.TraderName = src.TraderProfile?.User.FullName ?? "Unknown Trader";
+                    dest.TraderName = src.TraderProfile?.User?.FullName ?? "Unknown Trader";
                     dest.CityName = src.City?.Name ?? "Unknown City";
                 }).ReverseMap();
 

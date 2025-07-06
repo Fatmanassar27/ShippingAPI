@@ -110,7 +110,8 @@ namespace ShippingAPI.Controllers
             unit.CustomPriceRepo.add(customPrice);
             unit.save();
 
-            displayCustomPriceDTO result = mapper.Map<displayCustomPriceDTO>(customPrice);
+            displayCustomPriceDTO result = mapper.Map<displayCustomPriceDTO>
+                (unit.CustomPriceRepo.getByIdWithObjs(customPrice.Id));
             return Ok(result);
         }
 

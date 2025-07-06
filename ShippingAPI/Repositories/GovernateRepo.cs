@@ -8,12 +8,10 @@ namespace ShippingAPI.Repositories
         public GovernateRepo(ShippingContext db) : base(db)
         {
         }
-        public City? getByName(string name)
+        public Governorate? getByName(string name)
         {
 
-            return db.Cities.Where(c => c.Name.ToLower() == name.ToLower()).FirstOrDefault();
-
-
+            return db.Governorates.Where(c => c.Name.ToLower() == name.ToLower()).FirstOrDefault();
         }
     }
 }

@@ -121,7 +121,7 @@ namespace ShippingAPI.Controllers
             //return Ok(couriers);
         }
 
-        [HttpGet("getcourierbyid/{id:int}")]
+        [HttpGet("getcourierbyid/{id}")]
         public IActionResult GetCourierById(string id)
         {
             var courier = uow.CourierProfileRepo.getByIdWithUser(id);
@@ -129,7 +129,9 @@ namespace ShippingAPI.Controllers
             {
                 return NotFound("The Courier Is Not Found");
             }
-            return Ok(courier);
+            var courierDtos = mapper.Map<CreateCourierDTO>(courier);
+            return Ok(courierDtos);
+            //return Ok(courier);
         }
         [HttpGet("getcourierbyname/{name}")]
         public IActionResult GetCourierByName(string name)
