@@ -41,7 +41,6 @@ namespace ShippingAPI.MappingConfigs
             // Order Mapping
             CreateMap<Order, addOrderDTO>().ReverseMap();
             CreateMap<Order, displayOrderDTO>().AfterMap(
-            CreateMap<Order, displayOrderDTO>().AfterMap(
                 (src, dest) =>
                 {
                     dest.BranchName = src.Branch?.Name ?? "";
