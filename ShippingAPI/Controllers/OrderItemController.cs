@@ -42,6 +42,18 @@ namespace ShippingAPI.Controllers
             return Ok(orderItemDTO);
         }
 
+        [HttpGet("byOrderId/{orderId}")]
+        public IActionResult getOrderItemsByOrderId(int orderId)
+        {
+            var orderItems = unit.OrderItemRepo.getAllOrderItemsByOrderIdWithOrder(orderId);
+            if (orderItems == null || orderItems.Count == 0)
+            {
+                return NotFound($"No order items found for Order ID {orderId}.");
+            }
+            List<displayOrderItemDTO> orderItemsDTO = mapper.Map<List<displayOrderItemDTO>>(orderItems);
+            return Ok(orderItemsDTO);
+        }
+
         [HttpPost]
         public IActionResult addOrderItem(addOrderItemDTO orderItemDTO)
         {
@@ -56,7 +68,7 @@ namespace ShippingAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public IActionResult editOrderItem(int id, addOrderItemDTO orderItemDTO) {
             var orderItem = unit.OrderItemRepo.getOrderItemByIdWithOrder(id);
             if(orderItem == null)
@@ -70,7 +82,7 @@ namespace ShippingAPI.Controllers
             return Ok(result);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public IActionResult deleteOrderItem(int id) {
             var orderItem = unit.OrderItemRepo.getOrderItemByIdWithOrder(id);
             if( orderItem == null)

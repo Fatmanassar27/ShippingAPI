@@ -31,13 +31,22 @@ namespace ShippingAPI.Repositories
             return db.CustomPrices.Include(cp => cp.TraderProfile.User).Include(cp => cp.City).Where(cp => cp.TraderProfile.User.UserName == userName).ToList();
         }
 
-        public List<CustomPrice> getByRegionName(string regionName)
+        public List<CustomPrice> getByCityId(int cityId)
         {
-            return db.CustomPrices.Include(cp => cp.TraderProfile.User).Include(cp => cp.City).Where(cp => cp.City.Name == regionName).ToList();
+            return db.CustomPrices.Include(cp => cp.TraderProfile.User).Include(cp => cp.City).Where(cp => cp.City.Id == cityId).ToList();
+        }
+        public List<CustomPrice> getByCityName(string cityName)
+        {
+            return db.CustomPrices.Include(cp => cp.TraderProfile.User).Include(cp => cp.City).Where(cp => cp.City.Name == cityName).ToList();
         }
         public List<CustomPrice> getActivePrices()
         {
             return db.CustomPrices.Where(cp => cp.IsActive).ToList();
+        }
+
+        public List<CustomPrice> getByTraderId(string traderId)
+        {
+            return db.CustomPrices.Include(cp => cp.TraderProfile.User).Include(cp => cp.City).Where(cp => cp.TraderProfile.User.Id == traderId).ToList();
         }
 
         public List<CustomPrice> getCustomPricesByPrice(decimal Price) {

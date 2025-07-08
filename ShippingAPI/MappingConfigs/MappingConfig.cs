@@ -1,13 +1,20 @@
 ﻿using AutoMapper;
 using ShippingAPI.DTOS;
+using ShippingAPI.DTOS.city_govern;
+using ShippingAPI.DTOS.courier;
 using ShippingAPI.DTOS.CustomPriceDTOs;
+using ShippingAPI.DTOS.ExtraVillagePriceDTOs;
+using ShippingAPI.DTOS.FinancialTransferDtOs;
 using ShippingAPI.DTOS.OrderDTOs;
 using ShippingAPI.DTOS.OrderItemDTOs;
 using ShippingAPI.DTOS.Permissions;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
+using ShippingAPI.DTOS.RejectionReasonDTOs;
 using ShippingAPI.DTOS.Saves;
 using ShippingAPI.DTOS.ShippingTypeDTOs;
+using ShippingAPI.DTOS.TraderDTOs;
+using ShippingAPI.DTOS.WeightDTOs;
 using ShippingAPI.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -18,11 +25,12 @@ namespace ShippingAPI.MappingConfigs
         public MappingConfig()
         {
             // CustomPrice Mapping
-            CreateMap<CustomPrice,addCustomPriceDTO>().ReverseMap();
+            CreateMap<CustomPrice, addCustomPriceDTO>().ReverseMap();
+            CreateMap<CustomPrice, addCustomPriceDTO>().ReverseMap();
             CreateMap<CustomPrice, displayCustomPriceDTO>().AfterMap(
                 (src, dest) =>
                 {
-                    dest.UserName = src.TraderProfile?.User.UserName ?? "Unknown User";
+                    dest.TraderName = src.TraderProfile?.User?.FullName ?? "Unknown Trader";
                     dest.CityName = src.City?.Name ?? "Unknown City";
                 }).ReverseMap();
 
@@ -32,18 +40,45 @@ namespace ShippingAPI.MappingConfigs
 
             // Order Mapping
             CreateMap<Order, addOrderDTO>().ReverseMap();
-            CreateMap<Order , displayOrderDTO>().AfterMap(
+            CreateMap<Order, displayOrderDTO>().AfterMap(
                 (src, dest) =>
                 {
-                    dest.BranchName = src.Branch.Name;
-                    dest.TraderName = src.TraderProfile.User.FullName;
-                    dest.CourierName = src.CourierProfile.User.FullName;
-                    dest.CityName = src.City.Name;
-                    dest.RejectionReason = src.RejectionReason.Reason;
-                    dest.GovernorateName = src.Governorate.Name;
+                    dest.BranchName = src.Branch?.Name ?? "";
+                    dest.TraderName = src.TraderProfile?.User?.FullName ?? "";
+                    dest.CourierName = src.CourierProfile?.User?.FullName ?? "";
+                    dest.CityName = src.City?.Name ?? "";
+                    dest.RejectionReason = src.RejectionReason?.Reason ?? "";
+                    dest.GovernorateName = src.Governorate?.Name ?? "";
 
                 }
                 ).ReverseMap();
+
+            //Trader Mapping
+            CreateMap<TraderProfile, TraderProfileDTO>().AfterMap(
+                (src, dest) =>
+                {
+                    dest.Email = src.User.Email;
+                    dest.FullName = src.User.FullName;
+                    dest.Address = src.User.Address;
+                }
+                ).ReverseMap();
+            CreateMap<TraderProfile, UpdateTraderDTO>().ReverseMap();
+
+            //Weight Mapping
+            CreateMap<Weight, addWeightDTO>().ReverseMap();
+            CreateMap<Weight, displayWeightDTO>().ReverseMap();
+
+            //RejectionReason Mapping
+            CreateMap<RejectionReason, addRejectionReasonDTO>().ReverseMap();
+            CreateMap<RejectionReason, displayRejectionReasonDTO>().ReverseMap();
+
+            // OrderItem Mapping
+            CreateMap<OrderItem, addOrderItemDTO>().ReverseMap();
+            CreateMap<OrderItem, displayOrderItemDTO>().ReverseMap();
+
+            //ExtraVillagePrice Mapping
+            CreateMap<ExtraVillagePrice, addExtraPriceDTO>().ReverseMap();
+            CreateMap<ExtraVillagePrice, displayExtraPriceDTO>().ReverseMap();
 
             // Bank Mapping
             CreateMap<Bank, BankDTO>()
@@ -61,36 +96,95 @@ namespace ShippingAPI.MappingConfigs
                 .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.BranchId))
                 .ForMember(dest => dest.Branch, opt => opt.Ignore());
 
-            // OrderItem Mapping
-            CreateMap<OrderItem, addOrderItemDTO>().ReverseMap();
-            CreateMap<OrderItem, displayOrderItemDTO>().ReverseMap();
             CreateMap<ApplicationUser, UserProfileDTO>()
-      .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
-      .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-      .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-      .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
             CreateMap<Permission, PermissionDto>().ReverseMap();
             CreateMap<ActionType, ActionTypeDto>().ReverseMap();
             CreateMap<PermissionAction, PermissionActionDto>().ReverseMap();
             CreateMap<RegisterDTO, ApplicationUser>()
-        .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
-        .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-        .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-        .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+            .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
 
-            CreateMap<RegisterEmployeeDTO, ApplicationUser>()
-    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
-    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-    .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address)).ReverseMap();
-            CreateMap<EmployeeBranch, BranchDto>()
-    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Branch.Id))
-    .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Branch.Name)).ReverseMap();
+            // FinancialTransfer Mapping
+            CreateMap<FinancialTransferDto, FinancialTransfer>();
 
-            CreateMap<EmployeeSafe, SafeDto>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Safe.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Safe.Name))
-                .ForMember(dest => dest.IsDefault, opt => opt.MapFrom(src => src.IsDefault)).ReverseMap();
+            CreateMap<FinancialTransfer, FinancialTransferViewDto>()
+            .ForMember(dest => dest.SourceName, opt => opt.MapFrom(src => src.SourceBank != null ? src.SourceBank.Name : src.SourceSafe != null ? src.SourceSafe.Name : null))
+            .ForMember(dest => dest.DestinationName, opt => opt.MapFrom(src => src.DestinationBank != null ? src.DestinationBank.Name :  src.DestinationSafe != null ? src.DestinationSafe.Name : null))
+            .ForMember(dest => dest.AdminName, opt => opt.MapFrom(src =>  src.Admin != null ? src.Admin.UserName : null));
+
+            CreateMap<FinancialTransfer, BankTransactionReportDto>()
+           .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.SourceBank != null ? src.SourceBank.Name : src.DestinationBank != null ? src.DestinationBank.Name : string.Empty))
+           .ForMember(dest => dest.Credit, opt => opt.MapFrom(src => src.DestinationBankId != null ? src.Amount : 0))
+           .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceBankId != null ? src.Amount : 0));
+
+            CreateMap<FinancialTransfer, SafeTransactionReportDto>()
+                .ForMember(dest => dest.SafeName, opt => opt.MapFrom(src => src.SourceSafe != null ? src.SourceSafe.Name : src.DestinationSafe != null ? src.DestinationSafe.Name : string.Empty))
+                .ForMember(dest => dest.Credit, opt => opt.MapFrom(src => src.DestinationSafeId != null ? src.Amount : 0))
+                .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceSafeId != null ? src.Amount : 0));
+
+
+            // cityDTO
+            CreateMap<City, cityDTO>()
+                .ForMember(dest => dest.GoverrateName, opt => opt.MapFrom(src => src.Governorate.Name))
+                .ReverseMap();
+
+            // cityidDTO
+            CreateMap<City, cityidDTO>()
+                .ForMember(dest => dest.GoverrateName, opt => opt.MapFrom(src => src.Governorate.Name))
+                .ReverseMap();
+
+            // من DTO لـ Entity
+            CreateMap<cityDTO, City>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.PricePerKg, opt => opt.MapFrom(src => src.PricePerKg))
+                .ForMember(dest => dest.PickupCost, opt => opt.MapFrom(src => src.PickupCost))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
+                .ForMember(dest => dest.Governorate, opt => opt.Ignore()); // هتربطي الـ Governorate بإيدك بالـ Id في الكنترولر
+
+            CreateMap<cityidDTO, City>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.PricePerKg, opt => opt.MapFrom(src => src.PricePerKg))
+                .ForMember(dest => dest.PickupCost, opt => opt.MapFrom(src => src.PickupCost))
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
+                .ForMember(dest => dest.Governorate, opt => opt.Ignore()); // برضو تربطي الـ GovernorateId بنفسك في الكنترولر
+
+            //governorate mapping
+
+            CreateMap<Governorate, governrateDTO>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+
+                .ReverseMap();
+            CreateMap<Governorate, governrateidDTO>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+
+                .ReverseMap();
+            //branch mapping
+            CreateMap<Branch, branchDTO>().ReverseMap();
+            CreateMap<Branch, BranchIDdto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ReverseMap();
+
+            CreateMap<CourierProfile, CreateCourierDTO>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.UserName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.User.PasswordHash))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.User.Address))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                .ForMember(dest => dest.SelectedGovernorateIds, opt => opt.MapFrom(src => src.CourierGovernorates.Select(g => g.GovernorateId)))
+                .ForMember(dest => dest.SelectedBranchIds, opt => opt.MapFrom(src => src.CourierBranches.Select(b => b.BranchId))).ReverseMap();
+
         }
+
+
     }
 }

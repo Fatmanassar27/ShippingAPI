@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShippingAPI.Data;
 
@@ -11,9 +12,11 @@ using ShippingAPI.Data;
 namespace ShippingAPI.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    partial class ShippingContextModelSnapshot : ModelSnapshot
+    [Migration("20250705153044_AddAdminToFinancialTransfer")]
+    partial class AddAdminToFinancialTransfer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -547,39 +550,6 @@ namespace ShippingAPI.Migrations
                     b.ToTable("CustomPrices");
                 });
 
-            modelBuilder.Entity("ShippingAPI.Models.EmployeeBranch", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("BranchId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "BranchId");
-
-                    b.HasIndex("BranchId");
-
-                    b.ToTable("EmployeeBranches");
-                });
-
-            modelBuilder.Entity("ShippingAPI.Models.EmployeeSafe", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("SafeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("bit");
-
-                    b.HasKey("UserId", "SafeId");
-
-                    b.HasIndex("SafeId");
-
-                    b.ToTable("EmployeeSafes");
-                });
-
             modelBuilder.Entity("ShippingAPI.Models.ExtraVillagePrice", b =>
                 {
                     b.Property<int>("Id")
@@ -682,6 +652,9 @@ namespace ShippingAPI.Migrations
                     b.Property<string>("CourierId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("CourierProfileUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -705,9 +678,6 @@ namespace ShippingAPI.Migrations
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("OrderCost")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PaymentType")
                         .HasColumnType("int");
@@ -749,6 +719,8 @@ namespace ShippingAPI.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("CourierId");
+
+                    b.HasIndex("CourierProfileUserId");
 
                     b.HasIndex("GovernorateId");
 
@@ -952,9 +924,6 @@ namespace ShippingAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("PermissionActionId")
                         .HasColumnType("int");
 
@@ -963,8 +932,6 @@ namespace ShippingAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("PermissionActionId");
 
@@ -1201,44 +1168,6 @@ namespace ShippingAPI.Migrations
                     b.Navigation("TraderProfile");
                 });
 
-            modelBuilder.Entity("ShippingAPI.Models.EmployeeBranch", b =>
-                {
-                    b.HasOne("ShippingAPI.Models.Branch", "Branch")
-                        .WithMany("EmployeeBranches")
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ShippingAPI.Models.ApplicationUser", "User")
-                        .WithMany("EmployeeBranches")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Branch");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("ShippingAPI.Models.EmployeeSafe", b =>
-                {
-                    b.HasOne("ShippingAPI.Models.Safe", "Safe")
-                        .WithMany("EmployeeSafes")
-                        .HasForeignKey("SafeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ShippingAPI.Models.ApplicationUser", "User")
-                        .WithMany("EmployeeSafes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Safe");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ShippingAPI.Models.FinancialTransfer", b =>
                 {
                     b.HasOne("ShippingAPI.Models.ApplicationUser", "Admin")
@@ -1284,9 +1213,13 @@ namespace ShippingAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ShippingAPI.Models.CourierProfile", "CourierProfile")
-                        .WithMany("Orders")
+                    b.HasOne("ShippingAPI.Models.TraderProfile", "CourierProfile")
+                        .WithMany()
                         .HasForeignKey("CourierId");
+
+                    b.HasOne("ShippingAPI.Models.CourierProfile", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("CourierProfileUserId");
 
                     b.HasOne("ShippingAPI.Models.Governorate", "Governorate")
                         .WithMany()
@@ -1397,10 +1330,6 @@ namespace ShippingAPI.Migrations
 
             modelBuilder.Entity("ShippingAPI.Models.UserPermission", b =>
                 {
-                    b.HasOne("ShippingAPI.Models.ApplicationUser", null)
-                        .WithMany("UserPermissions")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("ShippingAPI.Models.PermissionAction", "PermissionAction")
                         .WithMany("UserPermissions")
                         .HasForeignKey("PermissionActionId")
@@ -1427,14 +1356,8 @@ namespace ShippingAPI.Migrations
                     b.Navigation("CourierProfile")
                         .IsRequired();
 
-                    b.Navigation("EmployeeBranches");
-
-                    b.Navigation("EmployeeSafes");
-
                     b.Navigation("TraderProfile")
                         .IsRequired();
-
-                    b.Navigation("UserPermissions");
                 });
 
             modelBuilder.Entity("ShippingAPI.Models.Bank", b =>
@@ -1451,8 +1374,6 @@ namespace ShippingAPI.Migrations
                     b.Navigation("Banks");
 
                     b.Navigation("CourierBranches");
-
-                    b.Navigation("EmployeeBranches");
 
                     b.Navigation("Orders");
 
@@ -1511,8 +1432,6 @@ namespace ShippingAPI.Migrations
                     b.Navigation("AccountTransactions");
 
                     b.Navigation("DestinationTransfers");
-
-                    b.Navigation("EmployeeSafes");
 
                     b.Navigation("SourceTransfers");
                 });

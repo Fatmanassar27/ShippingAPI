@@ -1,4 +1,5 @@
-﻿using ShippingAPI.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ShippingAPI.Data;
 using ShippingAPI.Models;
 
 namespace ShippingAPI.Repositories
@@ -7,6 +8,26 @@ namespace ShippingAPI.Repositories
     {
         public CourierProfileRepo(ShippingContext db) : base(db)
         {
+        }
+        public CourierProfile? getcourierbyname(string name)
+        {
+            return db.CourierProfiles.Include(c=>c.User).FirstOrDefault(c => c.User.UserName.ToLower() == name.ToLower());
+        }
+
+        public CourierProfile? getbyemail(string email)
+        {
+            return db.CourierProfiles.Include(c => c.User).FirstOrDefault(c => c.User.Email.ToLower() == email.ToLower());
+        }
+
+        public List<CourierProfile> getAllWithUser()
+        {
+            return db.CourierProfiles.Include(t => t.User).ToList();
+        }
+
+        public CourierProfile? getByIdWithUser(string userId)
+        {
+            return db.CourierProfiles.Include(t => t.User)
+                .FirstOrDefault(t => t.UserId == userId);
         }
     }
 }

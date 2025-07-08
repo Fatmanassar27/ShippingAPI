@@ -10,6 +10,6 @@ namespace ShippingAPI.Models
 
         [Column(TypeName = "Money")]
         public decimal Value { get; set; }
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; } = false;
     }
 }
