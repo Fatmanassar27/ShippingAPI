@@ -25,6 +25,7 @@ namespace ShippingAPI.Models
         public virtual ICollection<Safe> Saves { get; set; } = new List<Safe>();
         public virtual ICollection<CourierBranch> CourierBranches { get; set; }
         public virtual ICollection<TraderProfile> TraderProfiles { get; set; }
+        public virtual ICollection<EmployeeBranch> EmployeeBranches { get; set; } = new List<EmployeeBranch>();
 
     }
 }

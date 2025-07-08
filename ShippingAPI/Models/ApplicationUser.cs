@@ -19,6 +19,13 @@ namespace ShippingAPI.Models
         public virtual CourierProfile CourierProfile { get; set; }
         public virtual ICollection<AccountTransaction> AccountTransactions { get; set; } = new List<AccountTransaction>();
 
+        public virtual ICollection<EmployeeBranch> EmployeeBranches { get; set; }
+    = new List<EmployeeBranch>();
+
+        public virtual ICollection<EmployeeSafe> EmployeeSafes { get; set; }
+            = new List<EmployeeSafe>();
+        public virtual ICollection<UserPermission> UserPermissions { get; set; }
+            = new List<UserPermission>();
 
     }
 }

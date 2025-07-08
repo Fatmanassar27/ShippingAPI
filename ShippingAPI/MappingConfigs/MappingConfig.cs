@@ -77,6 +77,20 @@ namespace ShippingAPI.MappingConfigs
         .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
         .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
         .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+
+            CreateMap<RegisterEmployeeDTO, ApplicationUser>()
+    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+    .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address)).ReverseMap();
+            CreateMap<EmployeeBranch, BranchDto>()
+    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Branch.Id))
+    .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Branch.Name)).ReverseMap();
+
+            CreateMap<EmployeeSafe, SafeDto>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Safe.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Safe.Name))
+                .ForMember(dest => dest.IsDefault, opt => opt.MapFrom(src => src.IsDefault)).ReverseMap();
         }
     }
 }

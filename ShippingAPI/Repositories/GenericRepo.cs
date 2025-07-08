@@ -37,6 +37,10 @@ namespace ShippingAPI.Repositories
         {
             await db.Set<T>().AddAsync(item);
         }
+        public async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            await db.Set<T>().AddRangeAsync(entities);
+        }
         public void Edit(T item)
         {
             db.Entry(item).State = EntityState.Modified;
