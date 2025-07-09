@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShippingAPI.Data;
 
@@ -11,9 +12,11 @@ using ShippingAPI.Data;
 namespace ShippingAPI.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    partial class ShippingContextModelSnapshot : ModelSnapshot
+    [Migration("20250705203352_AddEmplyeeBranhAndSafes")]
+    partial class AddEmplyeeBranhAndSafes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -607,40 +610,45 @@ namespace ShippingAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdminId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<decimal>("Amount")
                         .HasColumnType("Money");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DestinationBankId")
+                    b.Property<int?>("DestinationId")
                         .HasColumnType("int");
 
                     b.Property<int?>("DestinationSafeId")
                         .HasColumnType("int");
 
+                    b.Property<string>("DestinationType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("Note")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int?>("SourceBankId")
+                    b.Property<int?>("SourceId")
                         .HasColumnType("int");
 
                     b.Property<int?>("SourceSafeId")
                         .HasColumnType("int");
 
+                    b.Property<string>("SourceType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AdminId");
-
-                    b.HasIndex("DestinationBankId");
+                    b.HasIndex("DestinationId");
 
                     b.HasIndex("DestinationSafeId");
 
-                    b.HasIndex("SourceBankId");
+                    b.HasIndex("SourceId");
 
                     b.HasIndex("SourceSafeId");
 
@@ -682,6 +690,9 @@ namespace ShippingAPI.Migrations
                     b.Property<string>("CourierId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("CourierProfileUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -705,9 +716,6 @@ namespace ShippingAPI.Migrations
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("OrderCost")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PaymentType")
                         .HasColumnType("int");
@@ -749,6 +757,8 @@ namespace ShippingAPI.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("CourierId");
+
+                    b.HasIndex("CourierProfileUserId");
 
                     b.HasIndex("GovernorateId");
 
@@ -1241,13 +1251,9 @@ namespace ShippingAPI.Migrations
 
             modelBuilder.Entity("ShippingAPI.Models.FinancialTransfer", b =>
                 {
-                    b.HasOne("ShippingAPI.Models.ApplicationUser", "Admin")
-                        .WithMany()
-                        .HasForeignKey("AdminId");
-
                     b.HasOne("ShippingAPI.Models.Bank", "DestinationBank")
                         .WithMany("DestinationTransfers")
-                        .HasForeignKey("DestinationBankId");
+                        .HasForeignKey("DestinationId");
 
                     b.HasOne("ShippingAPI.Models.Safe", "DestinationSafe")
                         .WithMany("DestinationTransfers")
@@ -1255,13 +1261,11 @@ namespace ShippingAPI.Migrations
 
                     b.HasOne("ShippingAPI.Models.Bank", "SourceBank")
                         .WithMany("SourceTransfers")
-                        .HasForeignKey("SourceBankId");
+                        .HasForeignKey("SourceId");
 
                     b.HasOne("ShippingAPI.Models.Safe", "SourceSafe")
                         .WithMany("SourceTransfers")
                         .HasForeignKey("SourceSafeId");
-
-                    b.Navigation("Admin");
 
                     b.Navigation("DestinationBank");
 
@@ -1284,9 +1288,13 @@ namespace ShippingAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ShippingAPI.Models.CourierProfile", "CourierProfile")
-                        .WithMany("Orders")
+                    b.HasOne("ShippingAPI.Models.TraderProfile", "CourierProfile")
+                        .WithMany()
                         .HasForeignKey("CourierId");
+
+                    b.HasOne("ShippingAPI.Models.CourierProfile", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("CourierProfileUserId");
 
                     b.HasOne("ShippingAPI.Models.Governorate", "Governorate")
                         .WithMany()

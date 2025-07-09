@@ -28,6 +28,7 @@ namespace ShippingAPI.Models
 
         [InverseProperty("DestinationSafe")]
         public virtual ICollection<FinancialTransfer> DestinationTransfers { get; set; } = new List<FinancialTransfer>();
+        public virtual ICollection<EmployeeSafe> EmployeeSafes { get; set; } = new List<EmployeeSafe>();
 
     }
 }

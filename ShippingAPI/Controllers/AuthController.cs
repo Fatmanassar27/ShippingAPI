@@ -49,12 +49,24 @@ namespace ShippingAPI.Controllers
 
             return Ok(profile);
         }
-
-        [HttpGet("roles")]
-        public async Task<IActionResult> getroles()
+        [HttpPost("register-employee")]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RegisterEmployee([FromBody] RegisterEmployeeDTO dto)
         {
-            var roles = await authService.GetRolesAsync();
-            return Ok(roles);
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.SelectMany(v => v.Errors)
+                                             .Select(e => e.ErrorMessage)
+                                             .FirstOrDefault();
+                return BadRequest(new { message = error ?? "Invalid input" });
+            }
+
+            var profile = await authService.RegisterToEmployeeAsync(dto);
+
+            if (profile == null)
+                return BadRequest(new { message = "Employee registration failed" });
+
+            return Ok(profile);
         }
     }
 }

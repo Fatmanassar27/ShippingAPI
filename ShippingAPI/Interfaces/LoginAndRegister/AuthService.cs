@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
 using ShippingAPI.Models;
+using ShippingAPI.UnitOfWorks;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -16,16 +17,19 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IMapper mapper;
+        private readonly UnitOfWork unitOfWork;
         private readonly IConfiguration config;
 
         public AuthService(UserManager<ApplicationUser> userManager,
                        RoleManager<IdentityRole> roleManager,
                        IMapper mapper,
+                       UnitOfWork unitOfWork,
                        IConfiguration config)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.mapper = mapper;
+            this.unitOfWork = unitOfWork;
             this.config = config;
         }
 
@@ -134,6 +138,72 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        public async Task<UserProfileDTO?> RegisterToEmployeeAsync(RegisterEmployeeDTO dto)
+        {
+            var user = mapper.Map<ApplicationUser>(dto);
+            user.IsActive = true;
+
+            var result = await userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+                return null;
+
+            // Add Role "Employee"
+            const string role = "Employee";
+            if (!await roleManager.RoleExistsAsync(role))
+                await roleManager.CreateAsync(new IdentityRole(role));
+
+            await userManager.AddToRoleAsync(user, role);
+
+            // Assign Branches
+            var employeeBranches = dto.BranchIds.Distinct()
+                .Select(branchId => new EmployeeBranch
+                {
+                    UserId = user.Id,
+                    BranchId = branchId
+                });
+            await unitOfWork.EmployeeBranchRepo.AddRangeAsync(employeeBranches);
+
+            // Assign Safes (First one is default)
+            var employeeSafes = dto.SafeIds.Distinct()
+                .Select((safeId, index) => new EmployeeSafe
+                {
+                    UserId = user.Id,
+                    SafeId = safeId,
+                    IsDefault = index == 0
+                });
+            await unitOfWork.EmployeeSafeRepo.AddRangeAsync(employeeSafes);
+
+            // Assign Permissions
+            if (dto.PermissionActionIds?.Any() == true)
+            {
+                var permissions = dto.PermissionActionIds.Distinct()
+                    .Select(paId => new UserPermission
+                    {
+                        UserId = user.Id,
+                        PermissionActionId = paId
+                    });
+                await unitOfWork.UserPermissionRepo.AddRangeAsync(permissions);
+            }
+
+            await unitOfWork.SaveAsync();
+
+            // Token
+            var token = GenerateToken(user);
+            user.CurrentToken = token;
+            user.TokenExpiration = DateTime.UtcNow.AddDays(7);
+            await userManager.UpdateAsync(user);
+
+            return new UserProfileDTO
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                FullName = user.FullName,
+                Address = user.Address,
+                Role = role,
+                Token = token,
+                TokenExpiration = user.TokenExpiration
+            };
         }
     }
 }
