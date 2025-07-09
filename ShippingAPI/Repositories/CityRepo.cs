@@ -11,12 +11,12 @@ namespace ShippingAPI.Repositories
         {
             return db.Cities.FirstOrDefault(c => c.Name.Contains(name));
         }
-        public City? getByName(string name)
-        {
+        //public City? getByName(string name)
+        //{
 
-            return db.Cities.Where(c => c.Name.ToLower() == name.ToLower()).FirstOrDefault();
+        //    return db.Cities.Where(c => c.Name.ToLower() == name.ToLower()).FirstOrDefault();
 
 
-        }
+        //}
     }
 }

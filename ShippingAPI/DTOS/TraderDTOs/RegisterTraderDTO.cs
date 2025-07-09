@@ -18,6 +18,10 @@ namespace ShippingAPI.DTOS.TraderDTOs
         [MinLength(6)]
         public string Password { get; set; }
 
+        [Required]
+        [Phone]
+        public string Phone { get; set; }
+
         // بيانات التاجر
         [Required]
         public string StoreName { get; set; }

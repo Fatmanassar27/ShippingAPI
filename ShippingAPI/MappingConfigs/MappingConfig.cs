@@ -60,9 +60,20 @@ namespace ShippingAPI.MappingConfigs
                     dest.Email = src.User.Email;
                     dest.FullName = src.User.FullName;
                     dest.Address = src.User.Address;
+                    dest.BranchName = src.Branch.Name;
+                    dest.IsActive = src.User.IsActive;
+                    dest.Phone = src.User.PhoneNumber;
                 }
                 ).ReverseMap();
-            CreateMap<TraderProfile, UpdateTraderDTO>().ReverseMap();
+            CreateMap<UpdateTraderDTO, TraderProfile>().AfterMap(
+                (src, dest) =>
+                {
+                    dest.User.Email = src.Email;
+                    dest.User.FullName = src.FullName;
+                    dest.User.Address = src.Address;
+                    dest.User.PhoneNumber = src.Phone;
+                    dest.User.IsActive = src.IsActive;
+                });
 
             //Weight Mapping
             CreateMap<Weight, addWeightDTO>().ReverseMap();
