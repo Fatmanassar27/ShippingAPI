@@ -74,6 +74,7 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
             var user = mapper.Map<ApplicationUser>(model);
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
+                
                 return null;
             if (!string.IsNullOrWhiteSpace(model.Role))
             {
@@ -101,6 +102,12 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                 TokenExpiration = user.TokenExpiration
             };
         }
+
+        public async Task<List<string>> GetRolesAsync()
+        {
+            return await Task.FromResult(roleManager.Roles.Select(r => r.Name).ToList());
+        }
+
 
         private string GenerateToken(ApplicationUser user)
         {

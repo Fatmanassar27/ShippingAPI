@@ -10,10 +10,15 @@ namespace ShippingAPI.DTOS.city_govern
         public string Name { get; set; } = string.Empty;
 
         [Required]
+        [StringLength(100)]
+        public string CityName { get; set; }
+
+        [Required]
         [StringLength(200)]
         public string Address { get; set; } = string.Empty;
 
         [Required]
+       
         public int CityId { get; set; } 
     }
 }

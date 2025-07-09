@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
@@ -47,6 +48,13 @@ namespace ShippingAPI.Controllers
                 return Unauthorized(new { message = "Username or password is incorrect, or account is inactive" });
 
             return Ok(profile);
+        }
+
+        [HttpGet("roles")]
+        public async Task<IActionResult> getroles()
+        {
+            var roles = await authService.GetRolesAsync();
+            return Ok(roles);
         }
     }
 }

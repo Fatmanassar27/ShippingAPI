@@ -29,7 +29,7 @@ namespace ShippingAPI.Controllers
             {
                 return NotFound("There Are Not Cities!");
             }
-            var newcities = map.Map<List<cityDTO>>(cities);
+            var newcities = map.Map<List<cityidDTO>>(cities);
             return Ok(newcities);
         }
 
@@ -61,28 +61,23 @@ namespace ShippingAPI.Controllers
         public IActionResult addCity(cityDTO cityDto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
 
-            // دوري على المحافظة بالاسم
-            var governorate = uow.GovernateRepo.getByName(cityDto.GoverrateName);
+            var cityExists = uow.CityRepo.getByName(cityDto.Name);
+            if (cityExists != null)
+                return BadRequest("City already exists");
+
+            var governorate = uow.GovernateRepo.getById(cityDto.GovernorateId);
             if (governorate == null)
-            {
                 return BadRequest("Governorate not found");
-            }
 
-            // اعملي الماب
             var city = map.Map<City>(cityDto);
-
-            // اربطي الـ GovernorateId يدوي
-            city.GovernorateId = governorate.Id;
-
             uow.CityRepo.add(city);
             uow.save();
 
-            return Ok("City Added Successfully");
+            return Ok(new { message = "City Added Successfully" });
         }
+
 
 
 
@@ -98,6 +93,12 @@ namespace ShippingAPI.Controllers
             if (existingCity == null)
             {
                 return NotFound("City not found");
+            }
+            // دوري على المدينة بالاسم
+            var cityByName = uow.CityRepo.getByName(cityDto.Name);
+            if (cityByName != null && cityByName.Id != cityDto.Id)
+            {
+                return BadRequest("City with this name already exists");
             }
 
             var governorate = uow.GovernateRepo.getByName(cityDto.GoverrateName);
@@ -115,8 +116,24 @@ namespace ShippingAPI.Controllers
             uow.cityRepo.edit(existingCity);
             uow.save();
 
-            return Ok("City Updated Successfully");
+            return Ok(new { message = "City Updated Successfully" });
         }
+        [HttpPut("togglestatusbyname/{name}")]
+        public IActionResult ToggleCityStatusByName(string name)
+        {
+            var city = uow.CityRepo.getByName(name);
+            if (city == null)
+                return NotFound("City not found.");
+
+            city.IsActive = !city.IsActive;
+
+            uow.CityRepo.edit(city);
+            uow.save();
+
+            return Ok(new { message = "City status updated successfully", isActive = city.IsActive });
+        }
+
+
 
 
         [HttpDelete("{id:int}")]

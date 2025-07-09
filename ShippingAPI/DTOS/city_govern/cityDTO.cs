@@ -10,10 +10,10 @@ namespace ShippingAPI.DTOS.city_govern
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;
 
-
         [Required]
-        [StringLength(100)]
-        public string GoverrateName { get; set; }
+        public int GovernorateId { get; set; }
+
+    
 
         //  تكلفة الشحن 
         [Column(TypeName = "Money")]

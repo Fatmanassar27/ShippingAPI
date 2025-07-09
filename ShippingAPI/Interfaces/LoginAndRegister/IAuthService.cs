@@ -7,5 +7,7 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
     {
         Task<UserProfileDTO?> RegisterAsync(RegisterDTO model);
         Task<UserProfileDTO?> LoginAsync(LoginDTO model);
+        Task<List<string>> GetRolesAsync();
+
     }
 }
