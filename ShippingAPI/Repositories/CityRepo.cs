@@ -15,6 +15,6 @@ namespace ShippingAPI.Repositories
             return db.Cities.Where(c => c.Name.ToLower() == name.ToLower()).FirstOrDefault();
 
 
-        //}
+        }
     }
 }
