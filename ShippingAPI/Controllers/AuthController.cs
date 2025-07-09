@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
@@ -45,6 +46,25 @@ namespace ShippingAPI.Controllers
             var profile = await authService.LoginAsync(model);
             if (profile == null)
                 return Unauthorized(new { message = "Username or password is incorrect, or account is inactive" });
+
+            return Ok(profile);
+        }
+        [HttpPost("register-employee")]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RegisterEmployee([FromBody] RegisterEmployeeDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values.SelectMany(v => v.Errors)
+                                             .Select(e => e.ErrorMessage)
+                                             .FirstOrDefault();
+                return BadRequest(new { message = error ?? "Invalid input" });
+            }
+
+            var profile = await authService.RegisterToEmployeeAsync(dto);
+
+            if (profile == null)
+                return BadRequest(new { message = "Employee registration failed" });
 
             return Ok(profile);
         }

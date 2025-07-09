@@ -34,6 +34,8 @@ namespace ShippingAPI.UnitOfWorks
         public PermissionActionRepo permissionActionRepo;
         public UserPermissionRepo userPermissionRepo;
         public ActionPermissionRepo actionPermissionRepo;
+        public EmployeeBranchRepo employeeBranchRepo;
+        public EmployeeSafeRepo employeeSafeRepo;
 
         public UnitOfWork(ShippingContext context) {
             this.context = context;
@@ -283,6 +285,24 @@ namespace ShippingAPI.UnitOfWorks
                 if (userPermissionRepo == null)
                     userPermissionRepo = new UserPermissionRepo(context);
                 return userPermissionRepo;
+            }
+        }
+        public EmployeeBranchRepo EmployeeBranchRepo
+        {
+            get
+            {
+                if (employeeBranchRepo == null)
+                    employeeBranchRepo = new EmployeeBranchRepo(context);
+                return employeeBranchRepo;
+            }
+        }
+        public EmployeeSafeRepo EmployeeSafeRepo
+        {
+            get
+            {
+                if (employeeSafeRepo == null)
+                    employeeSafeRepo = new EmployeeSafeRepo(context);
+                return employeeSafeRepo;
             }
         }
         public void save()

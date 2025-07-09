@@ -39,5 +39,16 @@ namespace ShippingAPI.Data
         public DbSet<PermissionAction> PermissionActions { get; set; }
         public DbSet<ActionType> ActionTypes { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
+        public DbSet<EmployeeBranch> EmployeeBranches { get; set; }
+        public DbSet<EmployeeSafe> EmployeeSafes { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<EmployeeBranch>()
+                .HasKey(eb => new { eb.UserId, eb.BranchId });
+            modelBuilder.Entity<EmployeeSafe>()
+               .HasKey(eb => new { eb.UserId, eb.SafeId });
+        }
     }
 }

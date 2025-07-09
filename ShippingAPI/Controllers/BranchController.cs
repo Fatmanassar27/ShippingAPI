@@ -28,7 +28,7 @@ namespace ShippingAPI.Controllers
             {
                 return NotFound("No branches found.");
             }
-            var newbranches = map.Map<List<branchDTO>>(branches);
+            var newbranches = map.Map<List<BranchIDdto>>(branches);
             return Ok(newbranches);
         }
         [HttpGet("{id}")]
@@ -40,7 +40,7 @@ namespace ShippingAPI.Controllers
                 return NotFound();
             }
           
-            var newbranch = map.Map<branchDTO>(branch); 
+            var newbranch = map.Map<BranchIDdto>(branch); 
             return Ok(newbranch);
         }
         [HttpGet("getbranchbyname/{name}")]
@@ -72,7 +72,7 @@ namespace ShippingAPI.Controllers
 
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         public IActionResult UpdateBranch(BranchIDdto model)
         {
             if (!ModelState.IsValid)
@@ -80,10 +80,15 @@ namespace ShippingAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var branch = uow.BranchRepo.getById(model.Id);
-            if (branch == null)
+            var existbranch = uow.BranchRepo.getById(model.Id);
+            if (existbranch == null)
             {
-                return NotFound();
+                return NotFound("branch not found");
+            }
+            var brachbyname = uow.BranchRepo.getByName(model.Name);
+            if (brachbyname != null && brachbyname.Id != model.Id)
+            {
+                return BadRequest("Branch with this name already exists");
             }
 
             if (model.CityId == 0)
@@ -91,8 +96,9 @@ namespace ShippingAPI.Controllers
                 return BadRequest("City not found");
             }
 
-            map.Map(model, branch);
-            uow.BranchRepo.edit(branch);
+            map.Map(model, existbranch);
+            existbranch.CityId = model.CityId;
+            uow.BranchRepo.edit(existbranch);
             uow.save();
             return NoContent();
         }
