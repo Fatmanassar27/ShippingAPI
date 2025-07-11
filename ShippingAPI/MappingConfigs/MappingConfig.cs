@@ -132,12 +132,15 @@ namespace ShippingAPI.MappingConfigs
             CreateMap<FinancialTransfer, BankTransactionReportDto>()
            .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.SourceBank != null ? src.SourceBank.Name : src.DestinationBank != null ? src.DestinationBank.Name : string.Empty))
            .ForMember(dest => dest.Credit, opt => opt.MapFrom(src => src.DestinationBankId != null ? src.Amount : 0))
+           .ForMember(dest => dest.AdminName, opt => opt.MapFrom(src => src.Admin.FullName != null ? src.Admin.FullName : ""))
            .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceBankId != null ? src.Amount : 0));
+           
 
             CreateMap<FinancialTransfer, SafeTransactionReportDto>()
-                .ForMember(dest => dest.SafeName, opt => opt.MapFrom(src => src.SourceSafe != null ? src.SourceSafe.Name : src.DestinationSafe != null ? src.DestinationSafe.Name : string.Empty))
-                .ForMember(dest => dest.Credit, opt => opt.MapFrom(src => src.DestinationSafeId != null ? src.Amount : 0))
-                .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceSafeId != null ? src.Amount : 0));
+            .ForMember(dest => dest.SafeName, opt => opt.MapFrom(src => src.SourceSafe != null ? src.SourceSafe.Name : src.DestinationSafe != null ? src.DestinationSafe.Name : string.Empty))
+            .ForMember(dest => dest.Credit, opt => opt.MapFrom(src => src.DestinationSafeId != null ? src.Amount : 0))
+            .ForMember(dest => dest.AdminName, opt => opt.MapFrom(src => src.Admin.FullName != null ? src.Admin.FullName : ""))
+            .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceSafeId != null ? src.Amount : 0));
 
 
             // cityDTO
