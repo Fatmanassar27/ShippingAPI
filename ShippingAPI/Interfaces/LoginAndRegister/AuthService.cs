@@ -78,8 +78,10 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
             var user = mapper.Map<ApplicationUser>(model);
             var result = await userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
-                
-                return null;
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new ApplicationException($"Registration failed: {errors}");
+            }
             if (!string.IsNullOrWhiteSpace(model.Role))
             {
                 var roleExists = await roleManager.RoleExistsAsync(model.Role);
