@@ -60,13 +60,15 @@ namespace ShippingAPI.Controllers
                                              .FirstOrDefault();
                 return BadRequest(new { message = error ?? "Invalid input" });
             }
-
-            var profile = await authService.RegisterToEmployeeAsync(dto);
-
-            if (profile == null)
-                return BadRequest(new { message = "Employee registration failed" });
-
-            return Ok(profile);
+            try
+            {
+                var profile = await authService.RegisterToEmployeeAsync(dto);
+                return Ok(profile);
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

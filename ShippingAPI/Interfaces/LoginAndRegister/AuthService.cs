@@ -146,16 +146,17 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
 
             var result = await userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
-                return null;
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new ApplicationException($"Registration failed: {errors}");
+            }
 
-            // Add Role "Employee"
             const string role = "Employee";
             if (!await roleManager.RoleExistsAsync(role))
                 await roleManager.CreateAsync(new IdentityRole(role));
 
             await userManager.AddToRoleAsync(user, role);
 
-            // Assign Branches
             var employeeBranches = dto.BranchIds.Distinct()
                 .Select(branchId => new EmployeeBranch
                 {
@@ -163,8 +164,6 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                     BranchId = branchId
                 });
             await unitOfWork.EmployeeBranchRepo.AddRangeAsync(employeeBranches);
-
-            // Assign Safes (First one is default)
             var employeeSafes = dto.SafeIds.Distinct()
                 .Select((safeId, index) => new EmployeeSafe
                 {
@@ -173,8 +172,6 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                     IsDefault = index == 0
                 });
             await unitOfWork.EmployeeSafeRepo.AddRangeAsync(employeeSafes);
-
-            // Assign Permissions
             if (dto.PermissionActionIds?.Any() == true)
             {
                 var permissions = dto.PermissionActionIds.Distinct()
@@ -188,7 +185,6 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
 
             await unitOfWork.SaveAsync();
 
-            // Token
             var token = GenerateToken(user);
             user.CurrentToken = token;
             user.TokenExpiration = DateTime.UtcNow.AddDays(7);
