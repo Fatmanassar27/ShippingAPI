@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.FinancialTransferDtOs;
@@ -37,28 +38,28 @@ namespace ShippingAPI.Controllers
             if (!success)
                 return StatusCode(500, "An error occurred while processing the transaction.");
 
-            return Ok("Transfer completed successfully.");
+            return Ok(new { message = "Transfer completed successfully." });
         }
         [HttpGet("banks")]
         public IActionResult GetBankTransfers([FromQuery] string? bankName = null,[FromQuery] DateTime? startDate = null,[FromQuery] DateTime? endDate = null)
         {
             var transfers = unit.FinancialTransferRepo.GetBankTransfersFiltered(bankName, startDate, endDate);
-
+            var result = new List<BankTransactionReportDto>() { };
             if (!transfers.Any())
-                return NotFound("No bank-related transfers found.");
+                return Ok(result);
 
-            var result = mapper.Map<List<BankTransactionReportDto>>(transfers);
+            result = mapper.Map<List<BankTransactionReportDto>>(transfers);
             return Ok(result);
         }
         [HttpGet("safes")]
         public IActionResult GetSafeTransfers([FromQuery] string? safeName = null,[FromQuery] DateTime? startDate = null,[FromQuery] DateTime? endDate = null)
         {
             var transfers = unit.FinancialTransferRepo.GetSafeTransfersFiltered(safeName, startDate, endDate);
-
+            var result = new List<SafeTransactionReportDto>() { };
             if (!transfers.Any())
-                return NotFound("No safe-related transfers found.");
+                return Ok(result);
 
-            var result = mapper.Map<List<SafeTransactionReportDto>>(transfers);
+            result = mapper.Map<List<SafeTransactionReportDto>>(transfers);
             return Ok(result);
         }
 

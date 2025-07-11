@@ -87,6 +87,7 @@ namespace ShippingAPI
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseCors("AllowAll");
 
