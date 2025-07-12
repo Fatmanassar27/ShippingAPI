@@ -115,5 +115,12 @@ namespace ShippingAPI.Controllers
             uow.save();
             return NoContent();
         }
+
+        [HttpGet("names")]
+        public IActionResult getallbranchnames()
+        {
+            List<string> names = uow.BranchRepo.getAll().Select(b => b.Name).ToList();
+            return Ok(names); 
+        }
     }
 }

@@ -3,8 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ShippingAPI.Data;
+using ShippingAPI.Interfaces.Dashboard;
 using ShippingAPI.Interfaces.LoginAndRegister;
 using ShippingAPI.Interfaces.Permissions;
+using ShippingAPI.InterfacesAndServices.Dashboard.Admin;
+using ShippingAPI.InterfacesAndServices.Dashboard.Representative;
+using ShippingAPI.InterfacesAndServices.Dashboard.Seller;
 using ShippingAPI.MappingConfigs;
 using ShippingAPI.Models;
 using ShippingAPI.Services.Permissions;
@@ -66,6 +70,9 @@ namespace ShippingAPI
             builder.Services.AddScoped<UnitOfWork>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IPermissionService, PermissionService>();
+            builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+            builder.Services.AddScoped<ISellerDashboardService, SellerDashboardService>();
+            builder.Services.AddScoped<IRepresentativeDashboardService, RepresentativeDashboardService>();
             //builder.Services.AddScoped<IAuthService,AuthService>();
             builder.Services.AddAutoMapper(typeof(MappingConfig));
 
@@ -86,6 +93,7 @@ namespace ShippingAPI
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseCors("AllowAll");
 

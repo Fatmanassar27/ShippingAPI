@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics.Metrics;
+using AutoMapper;
 using ShippingAPI.DTOS;
 using ShippingAPI.DTOS.city_govern;
 using ShippingAPI.DTOS.courier;
@@ -137,12 +138,15 @@ namespace ShippingAPI.MappingConfigs
             CreateMap<FinancialTransfer, BankTransactionReportDto>()
            .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.SourceBank != null ? src.SourceBank.Name : src.DestinationBank != null ? src.DestinationBank.Name : string.Empty))
            .ForMember(dest => dest.Credit, opt => opt.MapFrom(src => src.DestinationBankId != null ? src.Amount : 0))
+           .ForMember(dest => dest.AdminName, opt => opt.MapFrom(src => src.Admin.FullName != null ? src.Admin.FullName : ""))
            .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceBankId != null ? src.Amount : 0));
+           
 
             CreateMap<FinancialTransfer, SafeTransactionReportDto>()
-                .ForMember(dest => dest.SafeName, opt => opt.MapFrom(src => src.SourceSafe != null ? src.SourceSafe.Name : src.DestinationSafe != null ? src.DestinationSafe.Name : string.Empty))
-                .ForMember(dest => dest.Credit, opt => opt.MapFrom(src => src.DestinationSafeId != null ? src.Amount : 0))
-                .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceSafeId != null ? src.Amount : 0));
+            .ForMember(dest => dest.SafeName, opt => opt.MapFrom(src => src.SourceSafe != null ? src.SourceSafe.Name : src.DestinationSafe != null ? src.DestinationSafe.Name : string.Empty))
+            .ForMember(dest => dest.Credit, opt => opt.MapFrom(src => src.DestinationSafeId != null ? src.Amount : 0))
+            .ForMember(dest => dest.AdminName, opt => opt.MapFrom(src => src.Admin.FullName != null ? src.Admin.FullName : ""))
+            .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceSafeId != null ? src.Amount : 0));
 
 
             // cityDTO
@@ -194,6 +198,7 @@ namespace ShippingAPI.MappingConfigs
                 .ForMember(dest => dest.City, opt => opt.Ignore()) // مهم جدًا: تجاهل تعديل الـ City نفسها
                 .ForMember(dest => dest.CityId, opt => opt.MapFrom(src => src.CityId)); // بس عين الـ CityId
 
+            CreateMap<branchDTO, Branch>().ReverseMap();
 
             CreateMap<CourierProfile, CreateCourierDTO>()
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
@@ -204,6 +209,27 @@ namespace ShippingAPI.MappingConfigs
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
                 .ForMember(dest => dest.SelectedGovernorateIds, opt => opt.MapFrom(src => src.CourierGovernorates.Select(g => g.GovernorateId)))
                 .ForMember(dest => dest.SelectedBranchIds, opt => opt.MapFrom(src => src.CourierBranches.Select(b => b.BranchId))).ReverseMap();
+
+            CreateMap<CourierProfile, displaycourier>()
+    .AfterMap((src, dest) =>
+    {
+        dest.UserName = src.User.UserName;
+        dest.Email = src.User.Email;
+        dest.Password = src.User.PasswordHash;
+        dest.FullName = src.User.FullName;
+        dest.Address = src.User.Address;
+        dest.PhoneNumber = src.User.PhoneNumber;
+        dest.SelectedGovernorates = src.CourierGovernorates?
+            .Select(c => c.Governorate.Name)
+            .Distinct()
+            .ToList();
+
+        dest.SelectedBranchs = src.CourierBranches?
+            .Select(b => b.Branch.Name)
+            .ToList();
+    })
+    .ReverseMap();
+
 
         }
 

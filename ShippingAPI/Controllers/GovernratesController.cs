@@ -80,17 +80,17 @@ namespace ShippingAPI.Controllers
             var existingGovernrate = uow.GovernateRepo.getById(governrateDto.Id);
             if (existingGovernrate == null)
             {
-                return NotFound("The Governrate Is Not Found");
+                return NotFound(new { message = "The Governrate Is Not Found" });
             }
             var existingByName = uow.GovernateRepo.getByName(governrateDto.Name);
             if (existingByName != null && existingByName.Id != governrateDto.Id)
             {
-                return BadRequest("The Governrate Name Already Exists");
+                return BadRequest(new {message= "The Governrate Name Already Exists" });
             }
             map.Map(governrateDto, existingGovernrate);
             uow.GovernateRepo.edit(existingGovernrate);
             uow.save();
-            return Ok("Governrate Updated Successfully");
+            return Ok(new {message= "Governrate Updated Successfully" });
 
         }
         [HttpDelete("{id:int}")]
@@ -107,7 +107,12 @@ namespace ShippingAPI.Controllers
         }
 
 
-
+        [HttpGet("names")]
+        public IActionResult getallgovernnames()
+        {
+            List<string> names = uow.GovernateRepo.getAll().Select(b => b.Name).ToList();
+            return Ok(names);
+        }
 
     }
 
