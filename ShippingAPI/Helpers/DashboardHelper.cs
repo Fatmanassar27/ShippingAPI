@@ -10,8 +10,8 @@ namespace ShippingAPI.Helpers
             return new DashboardStatsDto
             {
                 NewOrders = orders.Count(o => o.Status == OrderStatus.Pending),
-                PendingOrders = orders.Count(o => o.Status == OrderStatus.Confirmed),
-                DeliveredToRepresentativeOrders = orders.Count(o => o.Status == OrderStatus.InTransit),
+                PendingOrders = orders.Count(o => o.Status == OrderStatus.Delivered),
+                DeliveredToRepresentativeOrders = orders.Count(o => o.Status == OrderStatus.DeliveredToCourier),
                 DeliveredOrders = orders.Count(o => o.Status == OrderStatus.Delivered),
                 UnreachableOrders = orders.Count(o => o.RejectionReason?.Reason == "Unreachable"),
                 PostponedOrders = orders.Count(o => o.RejectionReason?.Reason == "Postponed"),
@@ -23,6 +23,8 @@ namespace ShippingAPI.Helpers
                 TotalRevenue = orders.Where(o => o.Status == OrderStatus.Delivered).Sum(o => o.OrderCost),
                 TotalCost = orders.Sum(o => o.TotalCost)
             };
+
+
         }
     }
 }
