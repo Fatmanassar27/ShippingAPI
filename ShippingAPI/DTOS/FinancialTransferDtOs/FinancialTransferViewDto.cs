@@ -8,6 +8,6 @@
         public string? Note { get; set; }
         public DateTime Date { get; set; }
         public string? AdminName { get; set; }
-        public string? TransferDirection { get; set; } // "إضافة" أو "خصم"
+        public string? TransferDirection { get; set; } 
     }
 }

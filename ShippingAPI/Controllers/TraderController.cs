@@ -38,6 +38,7 @@ namespace ShippingAPI.Controllers
                 UserName = dto.Email,
                 Email = dto.Email,
                 FullName = dto.FullName,
+                PhoneNumber = dto.Phone,
                 Address = dto.Address,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
@@ -94,19 +95,52 @@ namespace ShippingAPI.Controllers
             return Ok(result);
         }
 
+        //[HttpPut("{id}")]
+        //public IActionResult editTrader(string id, UpdateTraderDTO dto)
+        //{
+        //    var trader = unit.TraderProfileRepo.getByIdWithUser(id);
+        //    if (trader == null)
+        //        return NotFound("Trader not found." );
+
+        //    mapper.Map(dto, trader);
+        //    unit.TraderProfileRepo.edit(trader);
+        //    unit.save();
+        //    return Ok("Trader updated successfully.");
+        //}
+
         [HttpPut("{id}")]
         public IActionResult editTrader(string id, UpdateTraderDTO dto)
         {
             var trader = unit.TraderProfileRepo.getByIdWithUser(id);
             if (trader == null)
-                return NotFound("Trader not found." );
+                return NotFound("Trader not found.");
 
-            mapper.Map(dto, trader);
+            trader.User.Email = dto.Email;
+            trader.User.FullName = dto.FullName;
+            trader.User.Address = dto.Address;
+            trader.User.PhoneNumber = dto.Phone;
+            trader.User.IsActive = dto.IsActive;
+
+          
+            if (!string.IsNullOrWhiteSpace(dto.Password))
+            {
+                var hasher = new PasswordHasher<ApplicationUser>();
+                trader.User.PasswordHash = hasher.HashPassword(trader.User, dto.Password);
+            }
+
+            trader.StoreName = dto.StoreName;
+            trader.GovernorateId = dto.GovernorateId;
+            trader.CityId = dto.CityId;
+            trader.BranchId = dto.BranchId;
+            trader.CustomPickupCost = dto.CustomPickupCost;
+            trader.RejectedOrderShippingShare = dto.RejectedOrderShippingShare;
+
             unit.TraderProfileRepo.edit(trader);
             unit.save();
 
             return Ok("Trader updated successfully.");
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)

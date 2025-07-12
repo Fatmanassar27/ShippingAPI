@@ -29,11 +29,20 @@ namespace ShippingAPI.Controllers
                 return BadRequest(new { message = error ?? "Invalid input" });
             }
 
-            var profile = await authService.RegisterAsync(model);
-            if (profile == null)
-                return BadRequest(new { message = "Registration failed" });
-
-            return Ok(profile);
+            try
+            {
+                var profile = await authService.RegisterAsync(model);
+                return Ok(profile);
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // احتياطي لأي نوع استثناء غير متوقع
+                return StatusCode(500, new { message = "An unexpected error occurred", details = ex.Message });
+            }
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDTO model)
@@ -60,13 +69,15 @@ namespace ShippingAPI.Controllers
                                              .FirstOrDefault();
                 return BadRequest(new { message = error ?? "Invalid input" });
             }
-
-            var profile = await authService.RegisterToEmployeeAsync(dto);
-
-            if (profile == null)
-                return BadRequest(new { message = "Employee registration failed" });
-
-            return Ok(profile);
+            try
+            {
+                var profile = await authService.RegisterToEmployeeAsync(dto);
+                return Ok(profile);
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }
