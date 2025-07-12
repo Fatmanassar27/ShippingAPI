@@ -178,6 +178,7 @@ namespace ShippingAPI.MappingConfigs
                 .ForMember(dest => dest.City, opt => opt.Ignore()) // مهم جدًا: تجاهل تعديل الـ City نفسها
                 .ForMember(dest => dest.CityId, opt => opt.MapFrom(src => src.CityId)); // بس عين الـ CityId
 
+            CreateMap<branchDTO, Branch>().ReverseMap();
 
             CreateMap<CourierProfile, CreateCourierDTO>()
                 .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
