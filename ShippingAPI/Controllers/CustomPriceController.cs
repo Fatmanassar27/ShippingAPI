@@ -115,6 +115,30 @@ namespace ShippingAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPost("Bulk")]
+        public IActionResult AddBulkCustomPrices(List<addCustomPriceDTO> customPriceDtos)
+        {
+            if (customPriceDtos == null || customPriceDtos.Count == 0)
+                return BadRequest("No custom prices to save.");
+
+            var customPrices = new List<CustomPrice>();
+
+            foreach (var dto in customPriceDtos)
+            {
+                var city = unit.CityRepo.getById(dto.CityId);
+                if (city == null)
+                    return BadRequest($"City with ID {dto.CityId} does not exist.");
+
+                var entity = mapper.Map<CustomPrice>(dto);
+                customPrices.Add(entity);
+            }
+
+            unit.CustomPriceRepo.addRange(customPrices);
+            unit.save();
+
+            return Ok(new {message="Custom prices saved successfully." });
+        }
+
 
 
         [HttpPut("{id}")]

@@ -1,4 +1,5 @@
-﻿using ShippingAPI.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ShippingAPI.Data;
 using ShippingAPI.Models;
 
 namespace ShippingAPI.Repositories
@@ -15,6 +16,11 @@ namespace ShippingAPI.Repositories
             return db.Cities.Where(c => c.Name.ToLower() == name.ToLower()).FirstOrDefault();
 
 
+        }
+
+        public List<City> getByGovernorateId(int governorateId)
+        {
+            return db.Cities.Include(c=>c.Governorate).Where(c => c.GovernorateId == governorateId).ToList();
         }
     }
 }

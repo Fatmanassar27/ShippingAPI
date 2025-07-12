@@ -8,24 +8,12 @@ namespace ShippingAPI.Models
         [Key]
         public int Id { get; set; }
 
+        public DeliveryType DeliveryType { get; set; } = DeliveryType.AtBranch;
+
         public string CustomerName { get; set; }
         public string Email { get; set; }
         public string Phone1 { get; set; }
         public string Phone2 { get; set; }
-        public string StreetAddress { get; set; }
-
-        public DeliveryType DeliveryType { get; set; } = DeliveryType.AtBranch;
-        public bool DeliverToVillage { get; set; } = false;
-        public PaymentType PaymentType { get; set; } = PaymentType.Prepaid;
-        public double TotalWeight { get; set; }
-        public decimal OrderCost { get; set; }
-        public string Notes { get; set; }
-        public OrderStatus Status { get; set; } = OrderStatus.Pending;
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-        [ForeignKey("RejectionReason")]
-        public int? RejectionReasonId { get; set; }
-        public virtual RejectionReason RejectionReason { get; set; }
 
         //محافظة العميل 
         [ForeignKey("Governorate")]
@@ -36,12 +24,24 @@ namespace ShippingAPI.Models
         [ForeignKey("City")]
         public int CityId { get; set; }
         public virtual City City { get; set; }
+        public string StreetAddress { get; set; }
+
+        public bool DeliverToVillage { get; set; } = false;
+
+        [ForeignKey("ShippingType")]
+        public int? ShippingTypeId { get; set; }
+        public virtual ShippingType? ShippingType { get; set; }
+
+        public PaymentType PaymentType { get; set; } = PaymentType.Prepaid;
 
         [ForeignKey("Branch")]
         public int? BranchId { get; set; }
         public virtual Branch? Branch { get; set; }
-        public virtual ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
-
+        public double TotalWeight { get; set; }
+        public decimal OrderCost { get; set; }
+        public string Notes { get; set; }
+        public OrderStatus Status { get; set; } = OrderStatus.New;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         //تاجر 
         [ForeignKey("TraderProfile")]
@@ -51,18 +51,29 @@ namespace ShippingAPI.Models
         [ForeignKey("CourierProfile")]
         public string? CourierId { get; set; }
         public virtual CourierProfile? CourierProfile { get; set; }
+
+        [ForeignKey("RejectionReason")]
+        public int? RejectionReasonId { get; set; }
+        public virtual RejectionReason RejectionReason { get; set; }
+
+        public virtual ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
         public decimal TotalCost { get; set; }
 
 
     }
     public enum OrderStatus
     {
-        Pending = 1,
-        Confirmed = 2,
-        InTransit = 3,
+        New = 1,
+        Pending = 2,
+        DeliveredToCourier = 3,
         Delivered = 4,
-        Rejected = 5,
-        Cancelled = 6
+        NotReachable = 5, //لا يمكن الوصول
+        Postponed = 6, //تم التأجيل
+        PartiallyDelivered = 7,
+        CancelledByRecipient = 8, //تم إلغاء الطلب من قبل المستلم
+        RejectedWithPayment = 9,
+        RejectedWithPartialPayment = 10,
+        RejectedWithoutPayment = 11
     }
 
     public enum PaymentType

@@ -14,6 +14,8 @@ namespace ShippingAPI.DTOS.OrderDTOs
         public DeliveryType DeliveryType { get; set; } = DeliveryType.AtBranch;
         public bool DeliverToVillage { get; set; } = false;
         public PaymentType PaymentType { get; set; } = PaymentType.Prepaid;
+
+        public int ShippingTypeId { get; set; } 
         public double TotalWeight { get; set; }
         public decimal OrderCost { get; set; }
         public string Notes { get; set; }

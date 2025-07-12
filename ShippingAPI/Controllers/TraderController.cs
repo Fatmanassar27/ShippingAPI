@@ -62,7 +62,7 @@ namespace ShippingAPI.Controllers
             unit.TraderProfileRepo.add(traderProfile);
             unit.save();
 
-            return Ok("Trader Registered Successfully!" );
+            return Ok(new { message = "Trader Registered Successfully!", traderId = user.Id });
         }
 
         [HttpGet]
@@ -138,7 +138,7 @@ namespace ShippingAPI.Controllers
             unit.TraderProfileRepo.edit(trader);
             unit.save();
 
-            return Ok("Trader updated successfully.");
+            return Ok(new { message = "Trader Updated Successfully!" });
         }
 
 

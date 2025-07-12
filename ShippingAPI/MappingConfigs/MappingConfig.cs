@@ -26,12 +26,13 @@ namespace ShippingAPI.MappingConfigs
         {
             // CustomPrice Mapping
             CreateMap<CustomPrice, addCustomPriceDTO>().ReverseMap();
-            CreateMap<CustomPrice, addCustomPriceDTO>().ReverseMap();
             CreateMap<CustomPrice, displayCustomPriceDTO>().AfterMap(
                 (src, dest) =>
                 {
                     dest.TraderName = src.TraderProfile?.User?.FullName ?? "Unknown Trader";
                     dest.CityName = src.City?.Name ?? "Unknown City";
+                    dest.TraderId = src.TraderId;
+                    dest.CityId = src.CityId;
                 }).ReverseMap();
 
             // ShippingType Mapping
@@ -49,6 +50,7 @@ namespace ShippingAPI.MappingConfigs
                     dest.CityName = src.City?.Name ?? "";
                     dest.RejectionReason = src.RejectionReason?.Reason ?? "";
                     dest.GovernorateName = src.Governorate?.Name ?? "";
+                    dest.ShippingTypeName = src.ShippingType?.TypeName ?? "";
 
                 }
                 ).ReverseMap();
@@ -63,6 +65,9 @@ namespace ShippingAPI.MappingConfigs
                     dest.BranchName = src.Branch.Name;
                     dest.IsActive = src.User.IsActive;
                     dest.Phone = src.User.PhoneNumber;
+                    dest.CityName = src.City.Name;
+                    dest.GovernorateName = src.City.Governorate.Name;
+                    dest.BranchName = src.Branch.Name;
                 }
                 ).ReverseMap();
             CreateMap<UpdateTraderDTO, TraderProfile>().AfterMap(

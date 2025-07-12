@@ -149,6 +149,18 @@ namespace ShippingAPI.Controllers
             return Ok("City Deleted Successfully");
         }
 
+        [HttpGet("getbygovernorateid/{governorateId:int}")]
+        public IActionResult getByGovernorateId(int governorateId)
+        {
+            var cities = uow.CityRepo.getByGovernorateId(governorateId);
+            if (cities == null || !cities.Any())
+            {
+                return NotFound("There Are Not Cities For This Governorate!");
+            }
+            var newcities = map.Map<List<cityidDTO>>(cities);
+            return Ok(newcities);
+        }
 
-    }
+
+        }
 }

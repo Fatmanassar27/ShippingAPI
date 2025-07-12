@@ -10,18 +10,25 @@ namespace ShippingAPI.Repositories
 
         public List<TraderProfile> getAllWithUser()
         {
-            return db.TraderProfiles.Include(t => t.User).ToList();
+            return db.TraderProfiles.Include(t => t.User)
+                .Include(t => t.Governorate)
+                .Include(t => t.City)
+                .Include(t => t.Branch).ToList();
         }
 
         public TraderProfile? getByIdWithUser(string userId)
         {
             return db.TraderProfiles.Include(t => t.User)
+                .Include(t => t.Governorate)
+                .Include(t => t.City)
+                .Include(t => t.Branch)
                 .FirstOrDefault(t => t.UserId == userId);
         }
 
         public TraderProfile? getByStoreName(string name)
         {
             return db.TraderProfiles.Include(t => t.User)
+                .Include(t => t.Governorate).Include(t => t.City).Include(t => t.Branch)
                 .FirstOrDefault(t => t.StoreName == name);
         }
 

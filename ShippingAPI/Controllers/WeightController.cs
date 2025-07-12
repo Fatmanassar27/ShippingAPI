@@ -54,7 +54,7 @@ namespace ShippingAPI.Controllers
             var existingWeights = unit.WeightRepo.getAll();
             if (existingWeights.Any())
             {
-                return BadRequest("Only one weight is allowed. Please update the existing one.");
+                return BadRequest(new { message = "Only one weight is allowed. Please update the existing one." });
             }
 
             var weight = mapper.Map<Weight>(weightDto);

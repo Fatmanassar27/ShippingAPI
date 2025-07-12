@@ -52,5 +52,12 @@ namespace ShippingAPI.Repositories
         public List<CustomPrice> getCustomPricesByPrice(decimal Price) {
             return db.CustomPrices.Where(cp => cp.Price == Price).ToList();
         }
+
+
+        public void addRange(List<CustomPrice> entities)
+        {
+            db.CustomPrices.AddRange(entities);
+        }
+
     }
 }

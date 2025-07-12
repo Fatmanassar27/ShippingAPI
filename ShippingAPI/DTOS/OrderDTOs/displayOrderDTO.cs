@@ -15,6 +15,8 @@ namespace ShippingAPI.DTOS.OrderDTOs
 
         public DeliveryType DeliveryType { get; set; }
         public bool DeliverToVillage { get; set; }
+        public string ShippingTypeName { get; set; }
+
         public PaymentType PaymentType { get; set; }
         public double TotalWeight { get; set; }
         public decimal OrderCost { get; set; }
