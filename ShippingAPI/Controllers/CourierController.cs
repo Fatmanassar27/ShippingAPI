@@ -26,19 +26,19 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> Createcourier([FromBody] CreateCourierDTO courierdto)
+        public async Task<IActionResult> Createcourier([FromBody] CreateCourierDTO dto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var existinguaser = await usermanger.FindByEmailAsync(courierdto.Email);
+            var existinguaser = await usermanger.FindByEmailAsync(dto.Email);
             if (existinguaser != null)
             {
                 return BadRequest(new { message = "Email already exists" });
             }
             var allGovs = uow.GovernateRepo.getAll().Select(g => g.Id).ToList();
-            var invalidGovs = courierdto.SelectedGovernorateIds.Except(allGovs).ToList();
+            var invalidGovs = dto.SelectedGovernorateIds.Except(allGovs).ToList();
 
             if (invalidGovs.Any())
             {
@@ -51,7 +51,7 @@ namespace ShippingAPI.Controllers
 
             // التحقق من الفروع (لو عايزة تضيفي كمان)
             var allBranches = uow.BranchRepo.getAll().Select(b => b.Id).ToList();
-            var invalidBranches = courierdto.SelectedBranchIds.Except(allBranches).ToList();
+            var invalidBranches = dto.SelectedBranchIds.Except(allBranches).ToList();
 
             if (invalidBranches.Any())
             {
@@ -63,14 +63,14 @@ namespace ShippingAPI.Controllers
             }
             var newcourier = new ApplicationUser
             {
-                UserName = courierdto.UserName,
-                Email = courierdto.Email,
-                Address = courierdto.Address,
-                PhoneNumber = courierdto.PhoneNumber,
-                FullName = courierdto.FullName,
+                UserName = dto.UserName,
+                Email = dto.Email,
+                Address = dto.Address,
+                PhoneNumber = dto.PhoneNumber,
+                FullName = dto.FullName,
 
             };
-            var result = await usermanger.CreateAsync(newcourier, courierdto.Password);
+            var result = await usermanger.CreateAsync(newcourier, dto.Password);
             await usermanger.UpdateAsync(newcourier);
             if (!result.Succeeded)
             {
@@ -86,16 +86,16 @@ namespace ShippingAPI.Controllers
             var courierProfile = new CourierProfile
             {
                 UserId = newcourier.Id,
-                DiscountType = courierdto.DiscountType,
-                OrderShare = courierdto.OrderShare,
+                DiscountType = dto.DiscountType,
+                OrderShare = dto.OrderShare,
 
-                CourierGovernorates = courierdto.SelectedGovernorateIds.Select(govId => new CourierGovernorate
+                CourierGovernorates = dto.SelectedGovernorateIds.Select(govId => new CourierGovernorate
                 {
                     GovernorateId = govId,
                     CourierId = newcourier.Id
                 }).ToList(),
 
-                CourierBranches = courierdto.SelectedBranchIds.Select(branchId => new CourierBranch
+                CourierBranches =  dto.SelectedBranchIds.Select(branchId => new CourierBranch
                 {
                     BranchId = branchId,
                     CourierId = newcourier.Id
@@ -104,7 +104,7 @@ namespace ShippingAPI.Controllers
             uow.CourierProfileRepo.add(courierProfile);
             uow.save();
 
-            return Ok("Courier created successfully.");
+            return Ok(new {message= "Courier created successfully." });
         }
 
 
@@ -116,7 +116,7 @@ namespace ShippingAPI.Controllers
             {
                 return NotFound("There Are No Couriers!");
             }
-            var courierDtos = mapper.Map<List<CreateCourierDTO>>(couriers); 
+            var courierDtos = mapper.Map<List<displaycourier>>(couriers); 
             return Ok(courierDtos);
             //return Ok(couriers);
         }

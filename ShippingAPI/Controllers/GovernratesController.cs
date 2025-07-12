@@ -107,7 +107,12 @@ namespace ShippingAPI.Controllers
         }
 
 
-
+        [HttpGet("names")]
+        public IActionResult getallgovernnames()
+        {
+            List<string> names = uow.GovernateRepo.getAll().Select(b => b.Name).ToList();
+            return Ok(names);
+        }
 
     }
 

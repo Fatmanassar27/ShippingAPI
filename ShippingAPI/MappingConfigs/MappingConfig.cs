@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics.Metrics;
+using AutoMapper;
 using ShippingAPI.DTOS;
 using ShippingAPI.DTOS.city_govern;
 using ShippingAPI.DTOS.courier;
@@ -203,6 +204,27 @@ namespace ShippingAPI.MappingConfigs
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
                 .ForMember(dest => dest.SelectedGovernorateIds, opt => opt.MapFrom(src => src.CourierGovernorates.Select(g => g.GovernorateId)))
                 .ForMember(dest => dest.SelectedBranchIds, opt => opt.MapFrom(src => src.CourierBranches.Select(b => b.BranchId))).ReverseMap();
+
+            CreateMap<CourierProfile, displaycourier>()
+    .AfterMap((src, dest) =>
+    {
+        dest.UserName = src.User.UserName;
+        dest.Email = src.User.Email;
+        dest.Password = src.User.PasswordHash;
+        dest.FullName = src.User.FullName;
+        dest.Address = src.User.Address;
+        dest.PhoneNumber = src.User.PhoneNumber;
+        dest.SelectedGovernorates = src.CourierGovernorates?
+            .Select(c => c.Governorate.Name)
+            .Distinct()
+            .ToList();
+
+        dest.SelectedBranchs = src.CourierBranches?
+            .Select(b => b.Branch.Name)
+            .ToList();
+    })
+    .ReverseMap();
+
 
         }
 
