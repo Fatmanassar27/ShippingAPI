@@ -9,8 +9,8 @@ namespace ShippingAPI.Helpers
         {
             return new DashboardStatsDto
             {
-                NewOrders = orders.Count(o => o.Status == OrderStatus.Pending),
-                PendingOrders = orders.Count(o => o.Status == OrderStatus.Delivered),
+                NewOrders = orders.Count(o => o.Status == OrderStatus.New),
+                PendingOrders = orders.Count(o => o.Status == OrderStatus.Pending),
                 DeliveredToRepresentativeOrders = orders.Count(o => o.Status == OrderStatus.DeliveredToCourier),
                 DeliveredOrders = orders.Count(o => o.Status == OrderStatus.Delivered),
                 UnreachableOrders = orders.Count(o => o.RejectionReason?.Reason == "Unreachable"),
