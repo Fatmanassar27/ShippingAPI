@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ShippingAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class sloveErrorApplicationuser : Migration
+    public partial class initCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -445,11 +445,17 @@ namespace ShippingAPI.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PermissionActionId = table.Column<int>(type: "int", nullable: false)
+                    PermissionActionId = table.Column<int>(type: "int", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserPermissions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserPermissions_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserPermissions_PermissionActions_PermissionActionId",
                         column: x => x.PermissionActionId,
@@ -504,6 +510,30 @@ namespace ShippingAPI.Migrations
                         column: x => x.CourierId,
                         principalTable: "CourierProfiles",
                         principalColumn: "UserId",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmployeeBranches",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    BranchId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeBranches", x => new { x.UserId, x.BranchId });
+                    table.ForeignKey(
+                        name: "FK_EmployeeBranches_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_EmployeeBranches_Branches_BranchId",
+                        column: x => x.BranchId,
+                        principalTable: "Branches",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                 });
 
@@ -606,32 +636,61 @@ namespace ShippingAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EmployeeSafes",
+                columns: table => new
+                {
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SafeId = table.Column<int>(type: "int", nullable: false),
+                    IsDefault = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmployeeSafes", x => new { x.UserId, x.SafeId });
+                    table.ForeignKey(
+                        name: "FK_EmployeeSafes_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_EmployeeSafes_Safes_SafeId",
+                        column: x => x.SafeId,
+                        principalTable: "Safes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FinancialTransfers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SourceId = table.Column<int>(type: "int", nullable: true),
-                    SourceType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    DestinationId = table.Column<int>(type: "int", nullable: true),
-                    DestinationType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    SourceBankId = table.Column<int>(type: "int", nullable: true),
+                    SourceSafeId = table.Column<int>(type: "int", nullable: true),
+                    DestinationBankId = table.Column<int>(type: "int", nullable: true),
+                    DestinationSafeId = table.Column<int>(type: "int", nullable: true),
+                    AdminId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Amount = table.Column<decimal>(type: "Money", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    SourceSafeId = table.Column<int>(type: "int", nullable: true),
-                    DestinationSafeId = table.Column<int>(type: "int", nullable: true)
+                    Note = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FinancialTransfers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FinancialTransfers_Banks_DestinationId",
-                        column: x => x.DestinationId,
+                        name: "FK_FinancialTransfers_AspNetUsers_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_FinancialTransfers_Banks_DestinationBankId",
+                        column: x => x.DestinationBankId,
                         principalTable: "Banks",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_FinancialTransfers_Banks_SourceId",
-                        column: x => x.SourceId,
+                        name: "FK_FinancialTransfers_Banks_SourceBankId",
+                        column: x => x.SourceBankId,
                         principalTable: "Banks",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -680,27 +739,27 @@ namespace ShippingAPI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    DeliveryType = table.Column<int>(type: "int", nullable: false),
                     CustomerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Phone1 = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Phone2 = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GovernorateId = table.Column<int>(type: "int", nullable: false),
+                    CityId = table.Column<int>(type: "int", nullable: false),
                     StreetAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DeliveryType = table.Column<int>(type: "int", nullable: false),
                     DeliverToVillage = table.Column<bool>(type: "bit", nullable: false),
+                    ShippingTypeId = table.Column<int>(type: "int", nullable: true),
                     PaymentType = table.Column<int>(type: "int", nullable: false),
+                    BranchId = table.Column<int>(type: "int", nullable: true),
                     TotalWeight = table.Column<double>(type: "float", nullable: false),
-                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OrderCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RejectionReasonId = table.Column<int>(type: "int", nullable: true),
-                    GovernorateId = table.Column<int>(type: "int", nullable: false),
-                    CityId = table.Column<int>(type: "int", nullable: false),
-                    BranchId = table.Column<int>(type: "int", nullable: true),
                     TraderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     CourierId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CourierProfileUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ShippingTypeId = table.Column<int>(type: "int", nullable: true)
+                    RejectionReasonId = table.Column<int>(type: "int", nullable: true),
+                    TotalCost = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -717,8 +776,8 @@ namespace ShippingAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_Orders_CourierProfiles_CourierProfileUserId",
-                        column: x => x.CourierProfileUserId,
+                        name: "FK_Orders_CourierProfiles_CourierId",
+                        column: x => x.CourierId,
                         principalTable: "CourierProfiles",
                         principalColumn: "UserId");
                     table.ForeignKey(
@@ -737,11 +796,6 @@ namespace ShippingAPI.Migrations
                         column: x => x.ShippingTypeId,
                         principalTable: "ShippingTypes",
                         principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Orders_TraderProfiles_CourierId",
-                        column: x => x.CourierId,
-                        principalTable: "TraderProfiles",
-                        principalColumn: "UserId");
                     table.ForeignKey(
                         name: "FK_Orders_TraderProfiles_TraderId",
                         column: x => x.TraderId,
@@ -886,9 +940,24 @@ namespace ShippingAPI.Migrations
                 column: "TraderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FinancialTransfers_DestinationId",
+                name: "IX_EmployeeBranches_BranchId",
+                table: "EmployeeBranches",
+                column: "BranchId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmployeeSafes_SafeId",
+                table: "EmployeeSafes",
+                column: "SafeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FinancialTransfers_AdminId",
                 table: "FinancialTransfers",
-                column: "DestinationId");
+                column: "AdminId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FinancialTransfers_DestinationBankId",
+                table: "FinancialTransfers",
+                column: "DestinationBankId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FinancialTransfers_DestinationSafeId",
@@ -896,9 +965,9 @@ namespace ShippingAPI.Migrations
                 column: "DestinationSafeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FinancialTransfers_SourceId",
+                name: "IX_FinancialTransfers_SourceBankId",
                 table: "FinancialTransfers",
-                column: "SourceId");
+                column: "SourceBankId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FinancialTransfers_SourceSafeId",
@@ -924,11 +993,6 @@ namespace ShippingAPI.Migrations
                 name: "IX_Orders_CourierId",
                 table: "Orders",
                 column: "CourierId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Orders_CourierProfileUserId",
-                table: "Orders",
-                column: "CourierProfileUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_GovernorateId",
@@ -981,6 +1045,11 @@ namespace ShippingAPI.Migrations
                 column: "GovernorateId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserPermissions_ApplicationUserId",
+                table: "UserPermissions",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserPermissions_PermissionActionId",
                 table: "UserPermissions",
                 column: "PermissionActionId");
@@ -1021,6 +1090,12 @@ namespace ShippingAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "CustomPrices");
+
+            migrationBuilder.DropTable(
+                name: "EmployeeBranches");
+
+            migrationBuilder.DropTable(
+                name: "EmployeeSafes");
 
             migrationBuilder.DropTable(
                 name: "ExtraVillagePrice");
