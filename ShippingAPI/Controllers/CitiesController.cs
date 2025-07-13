@@ -146,7 +146,8 @@ namespace ShippingAPI.Controllers
             }
             uow.cityRepo.delete(id);
             uow.save();
-            return Ok("City Deleted Successfully");
+            return Ok(new { message = "City Deleted Successfully"});
+      
         }
 
         [HttpGet("getbygovernorateid/{governorateId:int}")]

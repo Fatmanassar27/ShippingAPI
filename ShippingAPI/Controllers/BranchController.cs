@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ShippingAPI.DTOS.city_govern;
 using ShippingAPI.Models;
 using ShippingAPI.UnitOfWorks;
@@ -103,18 +104,25 @@ namespace ShippingAPI.Controllers
             return NoContent();
         }
 
-        [HttpDelete]
-        public IActionResult deletebranch(int id)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
         {
-            var branch = uow.BranchRepo.getById(id);
+            var branch =uow.BranchRepo.getById(id);
             if (branch == null)
-            {
                 return NotFound();
+
+            var hasCouriers = uow.CourierBranchRepo.getAll().Any(cb => cb.BranchId == id);
+            if (hasCouriers)
+            {
+                return BadRequest("Cannot delete this branch because it is assigned to one or more couriers.");
             }
-            uow.BranchRepo.delete(id);
+
+            uow.branchRepo.Delete(id);
             uow.save();
-            return NoContent();
+
+            return Ok();
         }
+
 
         [HttpGet("names")]
         public IActionResult getallbranchnames()

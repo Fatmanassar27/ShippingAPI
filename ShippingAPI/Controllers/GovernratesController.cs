@@ -99,12 +99,22 @@ namespace ShippingAPI.Controllers
             var governrate = uow.GovernateRepo.getById(id);
             if (governrate == null)
             {
-                return NotFound("The Governrate Is Not Found");
+                return NotFound("The Governrate is not found.");
             }
+
+            // التحقق من وجود مندوب مرتبط بالمحافظة
+            var hasCouriers = uow.CourierGovernorateRepo.getAll().Any(c => c.GovernorateId == id);
+            if (hasCouriers)
+            {
+                return BadRequest("Cannot delete this governorate because it's linked to one or more couriers.");
+            }
+
+            // لو مفيش ارتباط، يتم الحذف
             uow.GovernateRepo.delete(id);
             uow.save();
-            return Ok("Governrate Deleted Successfully");
+            return Ok(new {message= "Governorate deleted successfully." });
         }
+
 
 
         [HttpGet("names")]
