@@ -12,8 +12,8 @@ using ShippingAPI.Data;
 namespace ShippingAPI.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    [Migration("20250705203352_AddEmplyeeBranhAndSafes")]
-    partial class AddEmplyeeBranhAndSafes
+    [Migration("20250713141038_initCreate")]
+    partial class initCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -610,45 +610,40 @@ namespace ShippingAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AdminId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<decimal>("Amount")
                         .HasColumnType("Money");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DestinationId")
+                    b.Property<int?>("DestinationBankId")
                         .HasColumnType("int");
 
                     b.Property<int?>("DestinationSafeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("DestinationType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<string>("Note")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int?>("SourceId")
+                    b.Property<int?>("SourceBankId")
                         .HasColumnType("int");
 
                     b.Property<int?>("SourceSafeId")
                         .HasColumnType("int");
 
-                    b.Property<string>("SourceType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("DestinationId");
+                    b.HasIndex("AdminId");
+
+                    b.HasIndex("DestinationBankId");
 
                     b.HasIndex("DestinationSafeId");
 
-                    b.HasIndex("SourceId");
+                    b.HasIndex("SourceBankId");
 
                     b.HasIndex("SourceSafeId");
 
@@ -690,9 +685,6 @@ namespace ShippingAPI.Migrations
                     b.Property<string>("CourierId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("CourierProfileUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -716,6 +708,9 @@ namespace ShippingAPI.Migrations
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("OrderCost")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PaymentType")
                         .HasColumnType("int");
@@ -757,8 +752,6 @@ namespace ShippingAPI.Migrations
                     b.HasIndex("CityId");
 
                     b.HasIndex("CourierId");
-
-                    b.HasIndex("CourierProfileUserId");
 
                     b.HasIndex("GovernorateId");
 
@@ -1251,9 +1244,13 @@ namespace ShippingAPI.Migrations
 
             modelBuilder.Entity("ShippingAPI.Models.FinancialTransfer", b =>
                 {
+                    b.HasOne("ShippingAPI.Models.ApplicationUser", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId");
+
                     b.HasOne("ShippingAPI.Models.Bank", "DestinationBank")
                         .WithMany("DestinationTransfers")
-                        .HasForeignKey("DestinationId");
+                        .HasForeignKey("DestinationBankId");
 
                     b.HasOne("ShippingAPI.Models.Safe", "DestinationSafe")
                         .WithMany("DestinationTransfers")
@@ -1261,11 +1258,13 @@ namespace ShippingAPI.Migrations
 
                     b.HasOne("ShippingAPI.Models.Bank", "SourceBank")
                         .WithMany("SourceTransfers")
-                        .HasForeignKey("SourceId");
+                        .HasForeignKey("SourceBankId");
 
                     b.HasOne("ShippingAPI.Models.Safe", "SourceSafe")
                         .WithMany("SourceTransfers")
                         .HasForeignKey("SourceSafeId");
+
+                    b.Navigation("Admin");
 
                     b.Navigation("DestinationBank");
 
@@ -1288,13 +1287,9 @@ namespace ShippingAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ShippingAPI.Models.TraderProfile", "CourierProfile")
-                        .WithMany()
-                        .HasForeignKey("CourierId");
-
-                    b.HasOne("ShippingAPI.Models.CourierProfile", null)
+                    b.HasOne("ShippingAPI.Models.CourierProfile", "CourierProfile")
                         .WithMany("Orders")
-                        .HasForeignKey("CourierProfileUserId");
+                        .HasForeignKey("CourierId");
 
                     b.HasOne("ShippingAPI.Models.Governorate", "Governorate")
                         .WithMany()
@@ -1306,7 +1301,7 @@ namespace ShippingAPI.Migrations
                         .WithMany("Orders")
                         .HasForeignKey("RejectionReasonId");
 
-                    b.HasOne("ShippingAPI.Models.ShippingType", null)
+                    b.HasOne("ShippingAPI.Models.ShippingType", "ShippingType")
                         .WithMany("Orders")
                         .HasForeignKey("ShippingTypeId");
 
@@ -1323,6 +1318,8 @@ namespace ShippingAPI.Migrations
                     b.Navigation("Governorate");
 
                     b.Navigation("RejectionReason");
+
+                    b.Navigation("ShippingType");
 
                     b.Navigation("TraderProfile");
                 });
