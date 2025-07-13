@@ -57,7 +57,7 @@ namespace ShippingAPI.Controllers
             unit.OrderRepo.add(order);
             unit.save();
             displayOrderDTO result = mapper.Map<displayOrderDTO>(unit.OrderRepo.getByIdWithObj(order.Id));
-            return Ok(result);
+            return Ok(new { result  , id=order.Id});
         }
 
         [HttpPut("{id}")]
