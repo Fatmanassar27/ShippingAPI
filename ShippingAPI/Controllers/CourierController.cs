@@ -179,21 +179,57 @@ namespace ShippingAPI.Controllers
             }).ToList();
             uow.CourierProfileRepo.edit(existingCourier);
             uow.save();
-            return Ok("Courier updated successfully.");
+            return Ok(new { message = "Courier updated successfully." });
 
         }
-        [HttpDelete("{id:int}")]
-        public IActionResult DeleteCourier(int id)
+        [HttpDelete("delete/{courierId}")]
+        public async Task<IActionResult> DeleteCourier(string courierId)
         {
-            var courier = uow.CourierProfileRepo.getById(id);
-            if (courier == null)
+            var courierProfile = uow.CourierProfileRepo.getByIdWithUser(courierId);
+            if (courierProfile == null)
+                return NotFound(new { message = "Courier not found" });
+
+            var hasBranches = uow.CourierProfileRepo.hasRelatedBranches(courierId);
+            var hasGovernorates = uow.CourierProfileRepo.hasRelatedGovernorates(courierId);
+
+            if (hasBranches || hasGovernorates)
             {
-                return NotFound("The Courier Is Not Found");
+                return BadRequest(new
+                {
+                    message = "Cannot delete courier because there are related branches or governorates."
+                });
             }
-            uow.CourierProfileRepo.delete(id);
+
+            uow.CourierProfileRepo.delete(courierId);
+
+            var user = await usermanger.FindByIdAsync(courierId);
+            if (user != null)
+            {
+          
+                var roles = await usermanger.GetRolesAsync(user);
+                if (roles.Any())
+                {
+                    var removeRolesResult = await usermanger.RemoveFromRolesAsync(user, roles);
+                    if (!removeRolesResult.Succeeded)
+                    {
+                        return BadRequest(new { message = "Failed to remove user roles", errors = removeRolesResult.Errors });
+                    }
+                }
+
+                // ثم نحذف المستخدم نفسه
+                var result = await usermanger.DeleteAsync(user);
+                if (!result.Succeeded)
+                {
+                    return BadRequest(new { message = "Failed to delete user", errors = result.Errors });
+                }
+            }
+
             uow.save();
-            return Ok("Courier deleted successfully.");
+
+            return Ok(new { message = "Courier deleted successfully" });
         }
+
+
     }
 }
     

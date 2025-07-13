@@ -84,5 +84,15 @@ namespace ShippingAPI.Repositories
             if (entity != null)
                 db.Set<T>().Remove(entity);
         }
+        public void delete(string id)
+        {
+            var entity = db.Set<T>().Find(id);
+            if (entity != null)
+            {
+                db.Set<T>().Remove(entity);
+            }
+        }
+
+
     }
 }
