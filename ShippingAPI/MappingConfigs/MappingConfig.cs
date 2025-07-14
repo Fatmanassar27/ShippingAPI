@@ -227,6 +227,7 @@ namespace ShippingAPI.MappingConfigs
         dest.SelectedBranchs = src.CourierBranches?
             .Select(b => b.Branch.Name)
             .ToList();
+        dest.SelectedBranchsId = src.CourierBranches?.Select(b => b.BranchId).ToList();
     })
     .ReverseMap();
 

@@ -20,5 +20,6 @@ namespace ShippingAPI.DTOS.courier
 
         public List<string> SelectedGovernorates { get; set; }
         public List<string> SelectedBranchs { get; set; }
+        public List<int> SelectedBranchsId { get; set; }
     }
 }

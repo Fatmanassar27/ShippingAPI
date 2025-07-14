@@ -92,6 +92,23 @@ namespace ShippingAPI.Controllers
             unit.OrderItemRepo.delete(id);
             unit.save();
             return Ok($"Order Item With id {id} deleted Successfully");
-        } 
+        }
+
+        [HttpPost("bulkItems")]
+        public IActionResult BulkInsertItems(List<addOrderItemDTO> itemsDto)
+        {
+            if (itemsDto == null || !itemsDto.Any())
+                return BadRequest("No items provided");
+
+            var items = mapper.Map<List<OrderItem>>(itemsDto);
+            foreach (var item in items)
+            {
+                unit.OrderItemRepo.add(item);
+            }
+            unit.save();
+
+            return Ok("Order items saved successfully");
+        }
+
     }
 }
