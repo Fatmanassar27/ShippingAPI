@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ShippingAPI.DTOS.Employee;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
 using ShippingAPI.Interfaces.LoginAndRegister;
@@ -106,23 +105,6 @@ namespace ShippingAPI.Controllers
             {
                 return StatusCode(500, new { message = "An error occurred while retrieving permissions", details = ex.Message });
             }
-        }
-        [HttpPut("update-employee")]
-        public async Task<IActionResult> UpdateEmployee([FromBody] UpdateEmployeeDTO dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                var error = ModelState.Values.SelectMany(v => v.Errors)
-                                             .Select(e => e.ErrorMessage)
-                                             .FirstOrDefault();
-                return BadRequest(new { message = error ?? "Invalid input" });
-            }
-
-            var success = await authService.UpdateEmployeeAsync(dto);
-            if (!success)
-                return NotFound(new { message = "Employee not found or update failed" });
-
-            return Ok(new { message = "Employee updated successfully" });
         }
 
     }

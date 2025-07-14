@@ -84,6 +84,12 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 throw new ApplicationException($"Registration failed: {errors}");
             }
+            if (!string.IsNullOrWhiteSpace(model.Role))
+            {
+                var roleExists = await roleManager.RoleExistsAsync(model.Role);
+                if (roleExists)
+                    await userManager.AddToRoleAsync(user, model.Role);
+            }
             var token = GenerateToken(user);
             user.CurrentToken = token;
             user.TokenExpiration = DateTime.UtcNow.AddDays(7);
