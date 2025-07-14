@@ -9,5 +9,6 @@
         public string Address { get; set; }
         public bool IsActive { get; set; }
         public List<string> Permissions { get; set; } = new();
+
     }
 }

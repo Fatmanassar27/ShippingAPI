@@ -92,5 +92,20 @@ namespace ShippingAPI.Controllers
 
             return Ok($"Employee status updated to {(isActive ? "Active" : "Inactive")}");
         }
+        [HttpGet("employee/{userId}/permissions")]
+        //[Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetEmployeePermissions(string userId)
+        {
+            try
+            {
+                var permissions = await authService.GetEmployeeWithPermissionsByIdAsync(userId);
+                return Ok(permissions);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while retrieving permissions", details = ex.Message });
+            }
+        }
+
     }
 }

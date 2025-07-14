@@ -6,7 +6,7 @@ namespace ShippingAPI.UnitOfWorks
 {
     public class UnitOfWork
     {
-        ShippingContext context;
+       public ShippingContext context;
 
         public AccountTransactionRepo accountTransactionRepo;
         public AdminGroupRepo adminGroupRepo;

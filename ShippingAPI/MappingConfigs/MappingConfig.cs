@@ -252,33 +252,12 @@ namespace ShippingAPI.MappingConfigs
      .ForMember(dest => dest.TotalCost, opt => opt.MapFrom(src => src.TotalCost))
      .ForMember(dest => dest.TotalWeight, opt => opt.MapFrom(src => src.TotalWeight))
      .ForMember(dest => dest.SerialNumber, opt => opt.Ignore());
-            CreateMap<ApplicationUser, EmployeeWithPermissionsDTO>()
-    .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
-    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
-    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
-    .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
-    .ForMember(dest => dest.Permissions, opt => opt.MapFrom(src =>
-        src.UserPermissions.Select(p => p.PermissionAction.Permission.Name).ToList()));
-
-            CreateMap<RegisterEmployeeDTO, ApplicationUser>()
+     CreateMap<RegisterEmployeeDTO, ApplicationUser>()
     .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
     .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
     .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
     .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-    .ForMember(dest => dest.PhoneNumber, opt => opt.Ignore()) // لو مش موجود في DTO
-    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true)); // افتراضيًا الموظف Active
-    //.ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-    //.ForMember(dest => dest.CurrentToken, opt => opt.Ignore())
-    //.ForMember(dest => dest.TokenExpiration, opt => opt.Ignore())
-    //.ForMember(dest => dest.AdminProfile, opt => opt.Ignore())
-    //.ForMember(dest => dest.TraderProfile, opt => opt.Ignore())
-    //.ForMember(dest => dest.CourierProfile, opt => opt.Ignore())
-    //.ForMember(dest => dest.EmployeeBranches, opt => opt.Ignore())
-    //.ForMember(dest => dest.EmployeeSafes, opt => opt.Ignore())
-    //.ForMember(dest => dest.UserPermissions, opt => opt.Ignore())
-    //.ForMember(dest => dest.AccountTransactions, opt => opt.Ignore());
+    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true)); 
 
         }
 

@@ -205,29 +205,53 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                 TokenExpiration = user.TokenExpiration
             };
         }
-        public async Task<List<EmployeeWithPermissionsDTO>> GetAllEmployeesWithPermissionsAsync(string? search = null)
+        public async Task<List<EmployeeWithPermissionsDTO>> GetAllEmployeesWithPermissionsAsync()
         {
 
-
-            var filteredUsers = await userManager.Users
-       .Where(u => string.IsNullOrEmpty(search) ||
-                   u.FullName.Contains(search) ||
-                   u.Email.Contains(search) ||
-                   u.UserName.Contains(search))
-       .ToListAsync();
-
-            var employeeUsers = new List<ApplicationUser>();
-
-            foreach (var user in filteredUsers)
-            {
-                var roles = await userManager.GetRolesAsync(user);
-                if (roles.Contains("Employee"))
+            var employeeRole = await roleManager.FindByNameAsync("Employee");
+            if (employeeRole == null) return new List<EmployeeWithPermissionsDTO>();
+            var employeeIds = await unitOfWork.context.UserRoles
+                .Where(ur => ur.RoleId == employeeRole.Id)
+                .Select(ur => ur.UserId)
+                .ToListAsync();
+            var usersWithPermissions = await (
+                from u in unitOfWork.context.Users
+                where employeeIds.Contains(u.Id)
+                join up in unitOfWork.context.UserPermissions on u.Id equals up.UserId into userPerms
+                from up in userPerms.DefaultIfEmpty()
+                join pa in unitOfWork.context.PermissionActions on up.PermissionActionId equals pa.Id into permActions
+                from pa in permActions.DefaultIfEmpty()
+                join p in unitOfWork.context.Permissions on pa.PermissionId equals p.Id into perms
+                from p in perms.DefaultIfEmpty()
+                join at in unitOfWork.context.ActionTypes on pa.ActionTypeId equals at.Id into actions
+                from at in actions.DefaultIfEmpty()
+                group new { u, p, at } by new
                 {
-                    employeeUsers.Add(user);
+                    u.Id,
+                    u.UserName,
+                    u.FullName,
+                    u.Email,
+                    u.Address,
+                    u.IsActive
                 }
-            }
+                into g
+                select new EmployeeWithPermissionsDTO
+                {
+                    UserId = g.Key.Id,
+                    UserName = g.Key.UserName,
+                    FullName = g.Key.FullName,
+                    Email = g.Key.Email,
+                    Address = g.Key.Address,
+                    IsActive = g.Key.IsActive,
+                    Permissions = g
+                        .Where(x => x.p != null && x.at != null)
+                        .Select(x => $"{x.p.Name} - {x.at.Name}")
+                        .Distinct()
+                        .ToList()
+                }
+            ).ToListAsync();
 
-            return mapper.Map<List<EmployeeWithPermissionsDTO>>(employeeUsers);
+            return usersWithPermissions;
         }
 
         public async Task<bool> ToggleEmployeeStatusAsync(string userId, bool isActive)
@@ -239,6 +263,57 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
             await userManager.UpdateAsync(user);
             return true;
         }
+        public async Task<EmployeeWithPermissionsDTO?> GetEmployeeWithPermissionsByIdAsync(string userId)
+        {
+            var employeeRole = await roleManager.FindByNameAsync("Employee");
+            if (employeeRole == null)
+                return null;
 
+            var isEmployee = await unitOfWork.context.UserRoles
+                .AnyAsync(ur => ur.RoleId == employeeRole.Id && ur.UserId == userId);
+
+            if (!isEmployee)
+                return null;
+
+            var result = await (
+                from u in unitOfWork.context.Users
+                where u.Id == userId
+                join up in unitOfWork.context.UserPermissions on u.Id equals up.UserId into userPerms
+                from up in userPerms.DefaultIfEmpty()
+                join pa in unitOfWork.context.PermissionActions on up.PermissionActionId equals pa.Id into permActions
+                from pa in permActions.DefaultIfEmpty()
+                join p in unitOfWork.context.Permissions on pa.PermissionId equals p.Id into perms
+                from p in perms.DefaultIfEmpty()
+                join at in unitOfWork.context.ActionTypes on pa.ActionTypeId equals at.Id into actions
+                from at in actions.DefaultIfEmpty()
+                group new { u, p, at } by new
+                {
+                    u.Id,
+                    u.UserName,
+                    u.FullName,
+                    u.Email,
+                    u.Address,
+                    u.IsActive
+                }
+                into g
+                select new EmployeeWithPermissionsDTO
+                {
+                    UserId = g.Key.Id,
+                    UserName = g.Key.UserName,
+                    FullName = g.Key.FullName,
+                    Email = g.Key.Email,
+                    Address = g.Key.Address,
+                    IsActive = g.Key.IsActive,
+                    Permissions = g
+                        .Where(x => x.p != null && x.at != null)
+                        .Select(x => $"{x.p.Name} - {x.at.Name}")
+                        .Distinct()
+                        .ToList()
+                }
+            ).FirstOrDefaultAsync();
+
+            return result;
+        }
+       
     }
 }
