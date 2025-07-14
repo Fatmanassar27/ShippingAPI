@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.OrderDTOs;
 using ShippingAPI.Models;
 using ShippingAPI.UnitOfWorks;
+using System.Security.Claims;
 
 namespace ShippingAPI.Controllers
 {
@@ -67,6 +68,7 @@ namespace ShippingAPI.Controllers
             {
                 return BadRequest("Invalid Order data");
             }
+
             var order = unit.OrderRepo.getByIdWithObj(id);
             if (order == null)
             {
@@ -74,9 +76,10 @@ namespace ShippingAPI.Controllers
             }
 
             var oldStatus = order.Status;
-            mapper.Map(orderDTO, order); 
+            mapper.Map(orderDTO, order);
 
-            unit.OrderRepo.edit(order);
+            // ✳️ جيب الـ UserId من الـ Claims
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (order.Status != oldStatus)
             {
@@ -85,16 +88,19 @@ namespace ShippingAPI.Controllers
                     OrderId = order.Id,
                     OldStatus = oldStatus,
                     NewStatus = order.Status,
-                    ChangedByUserId = User?.Claims?.FirstOrDefault(c => c.Type == "uid")?.Value ?? "admin", // حسب السيستم عندك
-                    Notes = $"Status updated via admin panel to {order.Status.ToString()}",
+                    ChangedByUserId = userId, 
+                    Notes = $"Status updated via admin panel to {order.Status}",
                     ChangedAt = DateTime.UtcNow
                 };
                 unit.context.OrderStatusHistories.Add(history);
             }
-           
+
+            unit.OrderRepo.edit(order);
             unit.save();
+
             displayOrderDTO result = mapper.Map<displayOrderDTO>(unit.OrderRepo.getByIdWithObj(order.Id));
             return Ok(result);
+        
         }
 
         [HttpDelete("{id}")]
