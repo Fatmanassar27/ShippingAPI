@@ -1,9 +1,9 @@
-﻿using System.Diagnostics.Metrics;
-using AutoMapper;
+﻿using AutoMapper;
 using ShippingAPI.DTOS;
 using ShippingAPI.DTOS.city_govern;
 using ShippingAPI.DTOS.courier;
 using ShippingAPI.DTOS.CustomPriceDTOs;
+using ShippingAPI.DTOS.Employee;
 using ShippingAPI.DTOS.ExtraVillagePriceDTOs;
 using ShippingAPI.DTOS.FinancialTransferDtOs;
 using ShippingAPI.DTOS.OrderDTOs;
@@ -12,11 +12,13 @@ using ShippingAPI.DTOS.Permissions;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
 using ShippingAPI.DTOS.RejectionReasonDTOs;
+using ShippingAPI.DTOS.Reports.OrderDelivery;
 using ShippingAPI.DTOS.Saves;
 using ShippingAPI.DTOS.ShippingTypeDTOs;
 using ShippingAPI.DTOS.TraderDTOs;
 using ShippingAPI.DTOS.WeightDTOs;
 using ShippingAPI.Models;
+using System.Diagnostics.Metrics;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ShippingAPI.MappingConfigs
@@ -121,11 +123,17 @@ namespace ShippingAPI.MappingConfigs
             CreateMap<Permission, PermissionDto>().ReverseMap();
             CreateMap<ActionType, ActionTypeDto>().ReverseMap();
             CreateMap<PermissionAction, PermissionActionDto>().ReverseMap();
+            CreateMap<PermissionAction,Permissionactioncreate >()
+    .ForMember(dest => dest.PermissionName, opt => opt.MapFrom(src => src.Permission.Name))
+    .ForMember(dest => dest.ActionTypeName, opt => opt.MapFrom(src => src.ActionType.Name));
+
             CreateMap<RegisterDTO, ApplicationUser>()
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
             .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+            CreateMap<RegisterEmployeeDTO, ApplicationUser>();
+
 
             // FinancialTransfer Mapping
             CreateMap<FinancialTransferDto, FinancialTransfer>();
@@ -229,7 +237,27 @@ namespace ShippingAPI.MappingConfigs
             .ToList();
     })
     .ReverseMap();
-
+            CreateMap<Order, OrderReportDto>()
+     .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Id))
+     .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => src.CreatedAt))
+     .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.CustomerName))
+     .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.Phone1))
+     .ForMember(dest => dest.TraderName, opt => opt.MapFrom(src => src.TraderProfile.User.FullName))
+     .ForMember(dest => dest.CourierName, opt => opt.MapFrom(src => src.CourierProfile.User.FullName))
+     .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.Name))
+     .ForMember(dest => dest.GovernorrateName, opt => opt.MapFrom(src => src.Governorate.Name))
+     .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
+     .ForMember(dest => dest.StatusName, opt => opt.MapFrom(src => src.Status.ToString()))
+     .ForMember(dest => dest.OrderCost, opt => opt.MapFrom(src => src.OrderCost))
+     .ForMember(dest => dest.TotalCost, opt => opt.MapFrom(src => src.TotalCost))
+     .ForMember(dest => dest.TotalWeight, opt => opt.MapFrom(src => src.TotalWeight))
+     .ForMember(dest => dest.SerialNumber, opt => opt.Ignore());
+     CreateMap<RegisterEmployeeDTO, ApplicationUser>()
+    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+    .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true)); 
 
         }
 

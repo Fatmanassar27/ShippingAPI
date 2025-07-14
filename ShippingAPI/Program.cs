@@ -9,6 +9,7 @@ using ShippingAPI.Interfaces.Permissions;
 using ShippingAPI.InterfacesAndServices.Dashboard.Admin;
 using ShippingAPI.InterfacesAndServices.Dashboard.Representative;
 using ShippingAPI.InterfacesAndServices.Dashboard.Seller;
+using ShippingAPI.InterfacesAndServices.Reports;
 using ShippingAPI.MappingConfigs;
 using ShippingAPI.Models;
 using ShippingAPI.Services.Permissions;
@@ -73,6 +74,7 @@ namespace ShippingAPI
             builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
             builder.Services.AddScoped<ISellerDashboardService, SellerDashboardService>();
             builder.Services.AddScoped<IRepresentativeDashboardService, RepresentativeDashboardService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
             //builder.Services.AddScoped<IAuthService,AuthService>();
             builder.Services.AddAutoMapper(typeof(MappingConfig));
 

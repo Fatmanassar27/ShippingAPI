@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ShippingAPI.DTOS.courier;
+using ShippingAPI.DTOS.RejectionReasonDTOs;
 using ShippingAPI.Models;
 using ShippingAPI.UnitOfWorks;
 
@@ -30,7 +32,10 @@ namespace ShippingAPI.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var error = ModelState.Values.SelectMany(v => v.Errors)
+                                             .Select(e => e.ErrorMessage)
+                                             .FirstOrDefault();
+                return BadRequest(new { message = error ?? "Invalid input" });
             }
             var existinguaser = await usermanger.FindByEmailAsync(dto.Email);
             if (existinguaser != null)
@@ -74,7 +79,8 @@ namespace ShippingAPI.Controllers
             await usermanger.UpdateAsync(newcourier);
             if (!result.Succeeded)
             {
-                return BadRequest(new { message = "Failed to create courier", errors = result.Errors });
+                var firstError = result.Errors.FirstOrDefault()?.Description ?? "Creation failed";
+                return BadRequest(new { message = firstError });
             }
             if (!await roleManager.RoleExistsAsync("Courier"))
             {
@@ -228,6 +234,99 @@ namespace ShippingAPI.Controllers
 
             return Ok(new { message = "Courier deleted successfully" });
         }
+        //  كل الطلبات المرتبطة بكوريير معين
+        [HttpGet("courier-orders-display/{courierId}")]
+        public IActionResult GetOrdersForCourierDisplay(string courierId)
+        {
+            var orders = uow.CourierProfileRepo.GetOrdersByCourierId(courierId);
+
+            if (orders == null || !orders.Any())
+                return NotFound(new { message = "No orders found for this courier." });
+
+            var result = orders.Select(order => new OrderDisplayDTO
+            {
+              
+                OrderId = order.Id,
+                Status = (int)order.Status,
+                MerchantName = order.TraderProfile?.User.FullName ?? "غير معروف",
+                CustomerName = order.CustomerName,
+                PhoneNumber = order.Phone1,
+                Governorate=order.Governorate?.Name,
+                city=order.City?.Name,
+                branch=order.Branch?.Name,
+                OrderCost = order.OrderCost,
+               
+            }).ToList();
+
+            return Ok(result);
+        }
+        [HttpPut("update-order-status")]
+        public IActionResult UpdateOrderStatus([FromBody] UpdateOrderStatusDTO dto)
+        {
+            var order = uow.OrderRepo.getById(dto.OrderId);
+
+            if (order == null)
+                return NotFound(new { message = "Order not found." });
+
+            order.Status = (OrderStatus)dto.NewStatus;
+            uow.OrderRepo.edit(order);
+            uow.save();
+
+            return Ok(new { message = "Order status updated successfully." });
+        }
+
+
+
+        // الطلبات المرفوضة فقط الخاصة بكوريير معين
+        [HttpGet("rejected-orders/{courierId}")]
+        public IActionResult GetRejectedOrdersByCourierId(string courierId)
+        {
+            var rejectedOrders = uow.CourierProfileRepo.GetRejectedOrdersByCourierId(courierId);
+
+            if (rejectedOrders == null || !rejectedOrders.Any())
+            {
+                return NotFound(new { message = "No rejected orders found for this courier." });
+            }
+
+            var result = rejectedOrders.Select(order => new OrderDisplayDTO
+            {
+                OrderId = order.Id,
+                Status = (int)order.Status,
+                MerchantName = order.TraderProfile?.User.FullName ?? "غير معروف",
+                CustomerName = order.CustomerName,
+                PhoneNumber = order.Phone1,
+                Governorate = order.Governorate?.Name,
+                city = order.City?.Name,
+                branch = order.Branch?.Name,
+                OrderCost = order.OrderCost,
+            }).ToList();
+
+            return Ok(result);
+        }
+
+
+        // جميع أسباب الرفض المتاحة
+        [HttpGet("rejection-reasons")]
+        public IActionResult GetRejectionReasons()
+        {
+            var reasons = uow.CourierProfileRepo.GetRejectionReasons();
+
+            if (reasons == null || !reasons.Any())
+            {
+                return NotFound(new { message = "No rejection reasons found." });
+            }
+
+            var mappedReasons = reasons.Select(r => new displayRejectionReasonDTO
+            {
+                Id = r.Id,
+                Reason = r.Reason
+            }).ToList();
+
+            return Ok(mappedReasons);
+        }
+
+
+
 
 
     }

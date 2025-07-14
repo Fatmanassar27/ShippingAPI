@@ -92,6 +92,10 @@ namespace ShippingAPI.Repositories
 
             return totalCost;
         }
+        public IQueryable<Order> GetQueryable()
+        {
+            return db.Orders.AsQueryable(); 
+        }
 
     }
 }

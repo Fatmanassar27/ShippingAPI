@@ -13,5 +13,13 @@ namespace ShippingAPI.Repositories
             return await db.PermissionActions
                 .FirstOrDefaultAsync(a => a.PermissionId == permissionId && a.ActionTypeId == actionTypeId);
         }
+        public List<PermissionAction> getAllWithIncludes()
+        {
+            return db.PermissionActions
+                .Include(p => p.Permission)
+                .Include(p => p.ActionType)
+                .ToList();
+        }
+
     }
 }
