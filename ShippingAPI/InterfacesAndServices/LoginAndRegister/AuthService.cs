@@ -399,6 +399,18 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
             await unitOfWork.SaveAsync();
             return true;
         }
+        public async Task<bool> LogoutAsync(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+                return false;
+
+            user.CurrentToken = null;
+            user.TokenExpiration = null;
+
+            var result = await userManager.UpdateAsync(user);
+            return result.Succeeded;
+        }
 
 
     }
