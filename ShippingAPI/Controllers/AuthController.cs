@@ -59,7 +59,6 @@ namespace ShippingAPI.Controllers
             return Ok(profile);
         }
         [HttpPost("register-employee")]
-        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> RegisterEmployee([FromBody] RegisterEmployeeDTO dto)
         {
             if (!ModelState.IsValid)
