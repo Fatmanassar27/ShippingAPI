@@ -18,7 +18,7 @@ namespace ShippingAPI.Controllers
             this.authService = authService;
         }
         [HttpPost("register")]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO model)
         {
             if (!ModelState.IsValid)
