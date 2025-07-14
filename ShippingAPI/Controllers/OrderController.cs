@@ -91,8 +91,7 @@ namespace ShippingAPI.Controllers
                 };
                 unit.context.OrderStatusHistories.Add(history);
             }
-            mapper.Map(orderDTO, order);
-            unit.OrderRepo.edit(order);
+           
             unit.save();
             displayOrderDTO result = mapper.Map<displayOrderDTO>(unit.OrderRepo.getByIdWithObj(order.Id));
             return Ok(result);
