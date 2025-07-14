@@ -123,11 +123,17 @@ namespace ShippingAPI.MappingConfigs
             CreateMap<Permission, PermissionDto>().ReverseMap();
             CreateMap<ActionType, ActionTypeDto>().ReverseMap();
             CreateMap<PermissionAction, PermissionActionDto>().ReverseMap();
+            CreateMap<PermissionAction,Permissionactioncreate >()
+    .ForMember(dest => dest.PermissionName, opt => opt.MapFrom(src => src.Permission.Name))
+    .ForMember(dest => dest.ActionTypeName, opt => opt.MapFrom(src => src.ActionType.Name));
+
             CreateMap<RegisterDTO, ApplicationUser>()
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
             .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+            CreateMap<RegisterEmployeeDTO, ApplicationUser>();
+
 
             // FinancialTransfer Mapping
             CreateMap<FinancialTransferDto, FinancialTransfer>();
