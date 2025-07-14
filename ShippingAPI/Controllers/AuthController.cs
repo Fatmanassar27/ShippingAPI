@@ -18,7 +18,7 @@ namespace ShippingAPI.Controllers
             this.authService = authService;
         }
         [HttpPost("register")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO model)
         {
             if (!ModelState.IsValid)
@@ -40,7 +40,6 @@ namespace ShippingAPI.Controllers
             }
             catch (Exception ex)
             {
-                // احتياطي لأي نوع استثناء غير متوقع
                 return StatusCode(500, new { message = "An unexpected error occurred", details = ex.Message });
             }
         }
@@ -78,6 +77,21 @@ namespace ShippingAPI.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllEmployeesWithPermissions()
+        {
+            var employees = await authService.GetAllEmployeesWithPermissionsAsync();
+            return Ok(employees);
+        }
+        [HttpPut("toggle-status/{userId}")]
+        public async Task<IActionResult> ToggleEmployeeStatus(string userId, [FromQuery] bool isActive)
+        {
+            var result = await authService.ToggleEmployeeStatusAsync(userId, isActive);
+            if (!result)
+                return NotFound($"User with ID {userId} not found");
+
+            return Ok($"Employee status updated to {(isActive ? "Active" : "Inactive")}");
         }
     }
 }

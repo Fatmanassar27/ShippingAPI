@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ShippingAPI.DTOS.Employee;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
 using ShippingAPI.Models;
@@ -203,5 +205,40 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                 TokenExpiration = user.TokenExpiration
             };
         }
+        public async Task<List<EmployeeWithPermissionsDTO>> GetAllEmployeesWithPermissionsAsync(string? search = null)
+        {
+
+
+            var filteredUsers = await userManager.Users
+       .Where(u => string.IsNullOrEmpty(search) ||
+                   u.FullName.Contains(search) ||
+                   u.Email.Contains(search) ||
+                   u.UserName.Contains(search))
+       .ToListAsync();
+
+            var employeeUsers = new List<ApplicationUser>();
+
+            foreach (var user in filteredUsers)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                if (roles.Contains("Employee"))
+                {
+                    employeeUsers.Add(user);
+                }
+            }
+
+            return mapper.Map<List<EmployeeWithPermissionsDTO>>(employeeUsers);
+        }
+
+        public async Task<bool> ToggleEmployeeStatusAsync(string userId, bool isActive)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null) return false;
+
+            user.IsActive = isActive;
+            await userManager.UpdateAsync(user);
+            return true;
+        }
+
     }
 }
