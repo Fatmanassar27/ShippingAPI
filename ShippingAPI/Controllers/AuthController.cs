@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
 using ShippingAPI.Interfaces.LoginAndRegister;
+using System.Security.Claims;
 
 namespace ShippingAPI.Controllers
 {
@@ -105,6 +106,22 @@ namespace ShippingAPI.Controllers
             {
                 return StatusCode(500, new { message = "An error occurred while retrieving permissions", details = ex.Message });
             }
+        }
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("Invalid user ID");
+
+            var result = await authService.LogoutAsync(userId);
+
+            if (!result)
+                return BadRequest("Logout failed");
+
+            return Ok(new { message = "Logout successful" });
         }
 
     }
