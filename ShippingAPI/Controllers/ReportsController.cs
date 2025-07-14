@@ -15,8 +15,8 @@ namespace ShippingAPI.Controllers
         {
             this.reportService = reportService;
         }
-        [HttpPost("order-report")]
-        public async Task<IActionResult> GetReport(OrderReportRequestDto request)
+        [HttpGet("report")]
+        public async Task<IActionResult> GetOrderReport([FromQuery] OrderReportRequestDto request)
         {
             var result = await reportService.GetOrderReportAsync(request);
             return Ok(result);

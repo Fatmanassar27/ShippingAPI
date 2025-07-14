@@ -90,7 +90,7 @@ namespace ShippingAPI.Controllers
             if (!result)
                 return NotFound($"User with ID {userId} not found");
 
-            return Ok($"Employee status updated to {(isActive ? "Active" : "Inactive")}");
+            return Ok(new { message = $"Employee status updated to {(isActive ? "Active" : "Inactive")}" });
         }
         [HttpGet("employee/{userId}/permissions")]
         //[Authorize(Roles = "Admin")]

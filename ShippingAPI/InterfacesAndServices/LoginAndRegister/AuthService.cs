@@ -245,7 +245,7 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                     IsActive = g.Key.IsActive,
                     Permissions = g
                         .Where(x => x.p != null && x.at != null)
-                        .Select(x => $"{x.p.Name} - {x.at.Name}")
+                        .Select(x => $"{x.p.Name} ")
                         .Distinct()
                         .ToList()
                 }
@@ -305,8 +305,8 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                     Address = g.Key.Address,
                     IsActive = g.Key.IsActive,
                     Permissions = g
-                        .Where(x => x.p != null && x.at != null)
-                        .Select(x => $"{x.p.Name} - {x.at.Name}")
+                        .Where(x => x.p != null)
+                        .Select(x => x.p.Name)
                         .Distinct()
                         .ToList()
                 }

@@ -31,7 +31,7 @@ namespace ShippingAPI.InterfacesAndServices.Reports
         }
         private IQueryable<Order> BuildQuery(OrderReportRequestDto request)
         {
-            var query =  unitOfWork.OrderRepo.GetQueryable();
+            var query = unitOfWork.OrderRepo.GetQueryable();
 
             if (request.FromDate.HasValue)
                 query = query.Where(o => o.CreatedAt >= request.FromDate.Value);
@@ -51,20 +51,20 @@ namespace ShippingAPI.InterfacesAndServices.Reports
             if (request.PaymentType.HasValue)
                 query = query.Where(o => o.PaymentType == request.PaymentType);
 
-            if (!string.IsNullOrEmpty(request.TraderId))
-                query = query.Where(o => o.TraderId == request.TraderId);
+            if (!string.IsNullOrEmpty(request.TraderName))
+                query = query.Where(o => o.TraderProfile.User.FullName.Contains(request.TraderName));
 
-            if (!string.IsNullOrEmpty(request.CourierId))
-                query = query.Where(o => o.CourierId == request.CourierId);
+            if (!string.IsNullOrEmpty(request.CourierName))
+                query = query.Where(o => o.CourierProfile.User.FullName.Contains(request.CourierName));
 
-            if (request.BranchId.HasValue)
-                query = query.Where(o => o.BranchId == request.BranchId);
+            if (!string.IsNullOrEmpty(request.BranchName))
+                query = query.Where(o => o.Branch.Name.Contains(request.BranchName));
 
-            if (request.CityId.HasValue)
-                query = query.Where(o => o.CityId == request.CityId);
+            if (!string.IsNullOrEmpty(request.CityName))
+                query = query.Where(o => o.City.Name.Contains(request.CityName));
 
-            if (request.GovernorateId.HasValue)
-                query = query.Where(o => o.GovernorateId == request.GovernorateId);
+            if (!string.IsNullOrEmpty(request.GovernorateName))
+                query = query.Where(o => o.Governorate.Name.Contains(request.GovernorateName));
 
             return query.OrderByDescending(o => o.CreatedAt);
         }
