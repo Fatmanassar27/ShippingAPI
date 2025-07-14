@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.Attributes;
 using ShippingAPI.DTOS.Permissions;
@@ -53,6 +54,33 @@ namespace ShippingAPI.Controllers
             return permission is null ? NotFound() : Ok(permission);
         }
 
+        [HttpPut("edit")]
+        public async Task<IActionResult> EditPermission(int id, [FromBody] PermissionDto dto)
+        {
+            var permission = await _permissionService.GetPermissionByIdAsync(id);
+            if (permission is null || id != permission.Id)
+            {
+                return NotFound();
+            }
+            var updated = await _permissionService.UpdatePermissionAsync(id,dto);
+            return Ok(updated);
+        }
+
+
+        [HttpDelete("remove/{id}")]
+        public async Task<IActionResult> DeletePermission(int id)
+        {
+            var permission = await _permissionService.GetPermissionByIdAsync(id);
+            if (permission is null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return Ok(await _permissionService.DeletePermissionAsync(id));
+            }
+        }
+
         [HttpGet("actions")]
         public async Task<IActionResult> GetAllActions() =>
             Ok(await _permissionService.GetAllActionsAsync());
@@ -88,6 +116,8 @@ namespace ShippingAPI.Controllers
         {
             return Ok("✔ Authorized to manage orders.");
         }
+
+
 
     }
 }

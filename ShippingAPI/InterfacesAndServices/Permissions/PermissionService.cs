@@ -18,14 +18,30 @@ namespace ShippingAPI.Services.Permissions
             _mapper = mapper;
 
         }
-     public async Task<int> CreatePermissionAsync(PermissionDto dto)
+        public async Task<int> CreatePermissionAsync(PermissionDto dto)
         {
             var permission = _mapper.Map<Permission>(dto);
             await _unitOfWork.PermissionRepo.AddAsync(permission);
             await _unitOfWork.SaveAsync();
             return permission.Id;
         }
-        
+
+        public async Task<int> UpdatePermissionAsync(int id , PermissionDto dto)
+        {
+            var permission = await _unitOfWork.PermissionRepo.GetByIdAsync(id);
+            permission.Description = dto.Description;
+            permission.Name = dto.Name;
+            _unitOfWork.PermissionRepo.edit(permission);
+            await _unitOfWork.SaveAsync();
+            return permission.Id;
+        }
+        public async Task<int> DeletePermissionAsync(int id)
+        {
+            _unitOfWork.PermissionRepo.delete(id);
+            await _unitOfWork.SaveAsync();
+            return id;
+        }
+
 
         public async Task<int> CreateActionTypeAsync(ActionTypeDto dto)
         {
@@ -72,7 +88,8 @@ namespace ShippingAPI.Services.Permissions
                         PermissionActionId = permAction.Id
                     });
                 }
-            }            await _unitOfWork.SaveAsync();
+            }
+            await _unitOfWork.SaveAsync();
             return true;
         }
 
@@ -121,6 +138,9 @@ namespace ShippingAPI.Services.Permissions
             var action = await _unitOfWork.ActionPermissionRepo.GetByIdAsync(id);
             return action == null ? null : _mapper.Map<ActionTypeDto>(action);
         }
+
+
+
         public async Task<bool> UpdatePermissionActionsAsync(UpdatePermissionActionsDto dto)
         {
             var currentActions = await _unitOfWork.PermissionActionRepo.FindAsync(

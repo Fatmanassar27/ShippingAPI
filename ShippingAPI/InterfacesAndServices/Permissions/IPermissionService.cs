@@ -19,6 +19,9 @@ namespace ShippingAPI.Interfaces.Permissions
         Task<bool> UpdatePermissionActionsAsync(UpdatePermissionActionsDto dto);
         Task<bool> RemovePermissionActionsAsync(RemovePermissionActionsDto dto);
 
+        Task<int> DeletePermissionAsync(int id);
+
+        Task<int> UpdatePermissionAsync(int id , PermissionDto dto);
         Task<PermissionWithActionsDto?> GetActionsByPermissionIdAsync(int permissionId);
 
     }

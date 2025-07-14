@@ -10,11 +10,8 @@ namespace ShippingAPI.DTOS.RegisterAndLogin
         [Required] public string Password { get; set; } = string.Empty;
         public string Address { get; set; } = string.Empty;
 
-        // ↓ يمكن اختيار أكثر من فرع وخزنة
         [Required] public List<int> BranchIds { get; set; } = new();
         [Required] public List<int> SafeIds { get; set; } = new();
-
-        // صلاحيات دقيقة اختيارية
         public List<int>? PermissionActionIds { get; set; }
     }
 }
