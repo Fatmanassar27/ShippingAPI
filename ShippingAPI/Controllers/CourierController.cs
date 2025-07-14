@@ -235,6 +235,10 @@ namespace ShippingAPI.Controllers
             return Ok(new { message = "Courier deleted successfully" });
         }
         //  كل الطلبات المرتبطة بكوريير معين
+
+
+
+
         [HttpGet("courier-orders-display/{courierId}")]
         public IActionResult GetOrdersForCourierDisplay(string courierId)
         {
@@ -243,23 +247,33 @@ namespace ShippingAPI.Controllers
             if (orders == null || !orders.Any())
                 return NotFound(new { message = "No orders found for this courier." });
 
-            var result = orders.Select(order => new OrderDisplayDTO
+            // استبعاد الحالات المرفوضة
+            var filteredOrders = orders
+                .Where(order => order.Status != OrderStatus.RejectedWithPayment
+                             && order.Status != OrderStatus.RejectedWithPartialPayment
+                             && order.Status != OrderStatus.RejectedWithoutPayment)
+                .ToList();
+
+            var result = filteredOrders.Select(order => new OrderDisplayDTO
             {
-              
                 OrderId = order.Id,
                 Status = (int)order.Status,
                 MerchantName = order.TraderProfile?.User.FullName ?? "غير معروف",
                 CustomerName = order.CustomerName,
                 PhoneNumber = order.Phone1,
-                Governorate=order.Governorate?.Name,
-                city=order.City?.Name,
-                branch=order.Branch?.Name,
+                Governorate = order.Governorate?.Name,
+                city = order.City?.Name,
+                branch = order.Branch?.Name,
                 OrderCost = order.OrderCost,
-               
             }).ToList();
 
             return Ok(result);
         }
+
+
+
+
+
         [HttpPut("update-order-status")]
         public IActionResult UpdateOrderStatus([FromBody] UpdateOrderStatusDTO dto)
         {
@@ -268,12 +282,28 @@ namespace ShippingAPI.Controllers
             if (order == null)
                 return NotFound(new { message = "Order not found." });
 
+            // لو الحالة مرفوضة لازم سبب الرفض يبقى موجود
+            if ((dto.NewStatus == (int)OrderStatus.RejectedWithPayment ||
+                 dto.NewStatus == (int)OrderStatus.RejectedWithPartialPayment ||
+                 dto.NewStatus == (int)OrderStatus.RejectedWithoutPayment)
+                && dto.RejectionReasonId == null)
+            {
+                return BadRequest(new { message = "Rejection reason is required for rejected orders." });
+            }
+
+            // تحديث الحالة وسبب الرفض (لو موجود)
             order.Status = (OrderStatus)dto.NewStatus;
+            if (dto.RejectionReasonId != null)
+            {
+                order.RejectionReasonId = dto.RejectionReasonId;
+            }
+
             uow.OrderRepo.edit(order);
             uow.save();
 
             return Ok(new { message = "Order status updated successfully." });
         }
+
 
 
 
@@ -288,7 +318,7 @@ namespace ShippingAPI.Controllers
                 return NotFound(new { message = "No rejected orders found for this courier." });
             }
 
-            var result = rejectedOrders.Select(order => new OrderDisplayDTO
+            var result = rejectedOrders.Select(order => new RejectedOrderDisplayDTO
             {
                 OrderId = order.Id,
                 Status = (int)order.Status,
@@ -296,9 +326,10 @@ namespace ShippingAPI.Controllers
                 CustomerName = order.CustomerName,
                 PhoneNumber = order.Phone1,
                 Governorate = order.Governorate?.Name,
-                city = order.City?.Name,
-                branch = order.Branch?.Name,
+                City = order.City?.Name,
+                Branch = order.Branch?.Name,
                 OrderCost = order.OrderCost,
+                RejectionReason = order.RejectionReason?.Reason ?? "غير محدد"
             }).ToList();
 
             return Ok(result);

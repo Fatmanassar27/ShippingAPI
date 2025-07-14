@@ -4,5 +4,7 @@
     {
         public int OrderId { get; set; }
         public int NewStatus { get; set; }
+
+        public int? RejectionReasonId { get; set; }
     }
 }
