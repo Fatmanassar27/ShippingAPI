@@ -72,6 +72,25 @@ namespace ShippingAPI.Controllers
             {
                 return NotFound($"Order with ID {id} not found.");
             }
+
+            var oldStatus = order.Status;
+            mapper.Map(orderDTO, order); 
+
+            unit.OrderRepo.edit(order);
+
+            if (order.Status != oldStatus)
+            {
+                var history = new OrderStatusHistory
+                {
+                    OrderId = order.Id,
+                    OldStatus = oldStatus,
+                    NewStatus = order.Status,
+                    ChangedByUserId = User?.Claims?.FirstOrDefault(c => c.Type == "uid")?.Value ?? "admin", // حسب السيستم عندك
+                    Notes = $"Status updated via admin panel to {order.Status.ToString()}",
+                    ChangedAt = DateTime.UtcNow
+                };
+                unit.context.OrderStatusHistories.Add(history);
+            }
             mapper.Map(orderDTO, order);
             unit.OrderRepo.edit(order);
             unit.save();

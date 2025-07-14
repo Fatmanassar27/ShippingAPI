@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using ShippingAPI.DTOS.Reports;
 using ShippingAPI.DTOS.Reports.OrderDelivery;
 using ShippingAPI.Models;
 using ShippingAPI.UnitOfWorks;
@@ -67,6 +68,15 @@ namespace ShippingAPI.InterfacesAndServices.Reports
                 query = query.Where(o => o.Governorate.Name.Contains(request.GovernorateName));
 
             return query.OrderByDescending(o => o.CreatedAt);
+        }
+        public async Task<List<OrderStatusLogDto>> GetOrderStatusLogsAsync(int orderId)
+        {
+            var logs = await unitOfWork.context.OrderStatusHistories
+     .Where(o => o.OrderId == orderId)
+     .OrderByDescending(o => o.ChangedAt)
+     .ToListAsync();
+
+            return mapper.Map<List<OrderStatusLogDto>>(logs);
         }
     }
 }

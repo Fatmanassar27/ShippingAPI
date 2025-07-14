@@ -7,6 +7,7 @@ using ShippingAPI.DTOS.courier;
 using ShippingAPI.DTOS.RejectionReasonDTOs;
 using ShippingAPI.Models;
 using ShippingAPI.UnitOfWorks;
+using System.Security.Claims;
 
 namespace ShippingAPI.Controllers
 {
@@ -268,16 +269,32 @@ namespace ShippingAPI.Controllers
             if (order == null)
                 return NotFound(new { message = "Order not found." });
 
-            order.Status = (OrderStatus)dto.NewStatus;
+            var oldStatus = order.Status;
+            var newStatus = (OrderStatus)dto.NewStatus;
+            if (oldStatus == newStatus)
+            {
+                return BadRequest(new { message = "The status is already the same." });
+            }
+            order.Status = newStatus;
             uow.OrderRepo.edit(order);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var history = new OrderStatusHistory
+            {
+                OrderId = order.Id,
+                OldStatus = oldStatus,
+                NewStatus = newStatus,
+                ChangedByUserId = userId,
+                Notes = $"Status updated by courier {order.Status.ToString()}",
+                ChangedAt = DateTime.UtcNow
+            };
+
+            uow.context.OrderStatusHistories.Add(history);
+
             uow.save();
 
             return Ok(new { message = "Order status updated successfully." });
         }
-
-
-
-        // الطلبات المرفوضة فقط الخاصة بكوريير معين
         [HttpGet("rejected-orders/{courierId}")]
         public IActionResult GetRejectedOrdersByCourierId(string courierId)
         {

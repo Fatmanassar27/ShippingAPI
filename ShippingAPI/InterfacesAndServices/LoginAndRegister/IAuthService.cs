@@ -13,6 +13,7 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
         Task<List<EmployeeWithPermissionsDTO>> GetAllEmployeesWithPermissionsAsync();
         Task<EmployeeWithPermissionsDTO?> GetEmployeeWithPermissionsByIdAsync(string userId);
         Task<bool> ToggleEmployeeStatusAsync(string userId, bool isActive);
+        Task<bool> UpdateEmployeeAsync(UpdateEmployeeDTO dto);
 
 
 

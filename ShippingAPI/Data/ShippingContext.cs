@@ -41,6 +41,8 @@ namespace ShippingAPI.Data
         public DbSet<UserPermission> UserPermissions { get; set; }
         public DbSet<EmployeeBranch> EmployeeBranches { get; set; }
         public DbSet<EmployeeSafe> EmployeeSafes { get; set; }
+        public DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
