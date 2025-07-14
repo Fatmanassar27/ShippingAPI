@@ -13,12 +13,16 @@ namespace ShippingAPI.Controllers
     public class TraderController : ControllerBase
     {
         UnitOfWork unit;
+        private readonly UserManager<ApplicationUser> usermanger;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly IMapper mapper;
         UserManager<ApplicationUser> userManager;
 
-        public TraderController(UnitOfWork unit , UserManager<ApplicationUser> userManager, IMapper mapper)
+        public TraderController(UnitOfWork unit, UserManager<ApplicationUser> usermanger, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             this.unit = unit;
+            this.usermanger = usermanger;
+            this.roleManager = roleManager;
             this.userManager = userManager;
             this.mapper = mapper;
         }
@@ -47,6 +51,12 @@ namespace ShippingAPI.Controllers
             var result = await userManager.CreateAsync(user, dto.Password);
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
+            if (!await roleManager.RoleExistsAsync("Trader"))
+            {
+                await roleManager.CreateAsync(new IdentityRole("Trader"));
+            }
+
+            await usermanger.AddToRoleAsync(user, "Trader");
 
             var traderProfile = new TraderProfile
             {
