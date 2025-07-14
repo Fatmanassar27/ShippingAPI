@@ -276,44 +276,130 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                 return null;
 
             var result = await (
-                from u in unitOfWork.context.Users
-                where u.Id == userId
-                join up in unitOfWork.context.UserPermissions on u.Id equals up.UserId into userPerms
-                from up in userPerms.DefaultIfEmpty()
-                join pa in unitOfWork.context.PermissionActions on up.PermissionActionId equals pa.Id into permActions
-                from pa in permActions.DefaultIfEmpty()
-                join p in unitOfWork.context.Permissions on pa.PermissionId equals p.Id into perms
-                from p in perms.DefaultIfEmpty()
-                join at in unitOfWork.context.ActionTypes on pa.ActionTypeId equals at.Id into actions
-                from at in actions.DefaultIfEmpty()
-                group new { u, p, at } by new
-                {
-                    u.Id,
-                    u.UserName,
-                    u.FullName,
-                    u.Email,
-                    u.Address,
-                    u.IsActive
-                }
-                into g
-                select new EmployeeWithPermissionsDTO
-                {
-                    UserId = g.Key.Id,
-                    UserName = g.Key.UserName,
-                    FullName = g.Key.FullName,
-                    Email = g.Key.Email,
-                    Address = g.Key.Address,
-                    IsActive = g.Key.IsActive,
-                    Permissions = g
-                        .Where(x => x.p != null)
-                        .Select(x => x.p.Name)
-                        .Distinct()
-                        .ToList()
-                }
-            ).FirstOrDefaultAsync();
+           from u in unitOfWork.context.Users
+           where u.Id == userId
+
+           join up in unitOfWork.context.UserPermissions on u.Id equals up.UserId into userPerms
+           from up in userPerms.DefaultIfEmpty()
+
+           join pa in unitOfWork.context.PermissionActions on up.PermissionActionId equals pa.Id into permActions
+           from pa in permActions.DefaultIfEmpty()
+
+           join p in unitOfWork.context.Permissions on pa.PermissionId equals p.Id into perms
+           from p in perms.DefaultIfEmpty()
+
+           join at in unitOfWork.context.ActionTypes on pa.ActionTypeId equals at.Id into actions
+           from at in actions.DefaultIfEmpty()
+
+           join eb in unitOfWork.context.EmployeeBranches on u.Id equals eb.UserId into branchGroup
+           from eb in branchGroup.DefaultIfEmpty()
+
+           join es in unitOfWork.context.EmployeeSafes on u.Id equals es.UserId into safeGroup
+           from es in safeGroup.DefaultIfEmpty()
+
+           group new { u, p, eb, es } by new
+           {
+               u.Id,
+               u.UserName,
+               u.FullName,
+               u.Email,
+               u.Address,
+               u.IsActive
+           }
+           into g
+           select new EmployeeWithPermissionsDTO
+           {
+               UserId = g.Key.Id,
+               UserName = g.Key.UserName,
+               FullName = g.Key.FullName,
+               Email = g.Key.Email,
+               Address = g.Key.Address,
+               IsActive = g.Key.IsActive,
+
+               Permissions = g
+                   .Where(x => x.p != null)
+                   .Select(x => x.p.Name)
+                   .Distinct()
+                   .ToList(),
+
+               BranchIds = g
+                   .Where(x => x.eb != null)
+                   .Select(x => x.eb.BranchId)
+                   .Distinct()
+                   .ToList(),
+
+               SafeIds = g
+                   .Where(x => x.es != null)
+                   .Select(x => x.es.SafeId)
+                   .Distinct()
+                   .ToList()
+           }
+       ).FirstOrDefaultAsync();
 
             return result;
         }
-       
+        public async Task<bool> UpdateEmployeeAsync(UpdateEmployeeDTO dto)
+        {
+            var user = await userManager.FindByIdAsync(dto.UserId);
+            if (user == null)
+                return false;
+
+            mapper.Map(dto, user);
+
+            var result = await userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+                return false;
+
+            // تعديل الفروع BranchIds
+            if (dto.BranchIds?.Any() == true)
+            {
+                unitOfWork.context.EmployeeBranches.RemoveRange(user.EmployeeBranches.ToList());
+
+                var newBranches = dto.BranchIds.Distinct()
+                    .Select(branchId => new EmployeeBranch
+                    {
+                        UserId = user.Id,
+                        BranchId = branchId
+                    });
+
+                await unitOfWork.EmployeeBranchRepo.AddRangeAsync(newBranches);
+            }
+
+            // تعديل الخزن SafeIds
+            if (dto.SafeIds?.Any() == true)
+            {
+                unitOfWork.context.EmployeeSafes.RemoveRange(user.EmployeeSafes.ToList());
+
+                var newSafes = dto.SafeIds.Distinct()
+                    .Select((safeId, index) => new EmployeeSafe
+                    {
+                        UserId = user.Id,
+                        SafeId = safeId,
+                        IsDefault = index == 0
+                    });
+
+                await unitOfWork.EmployeeSafeRepo.AddRangeAsync(newSafes);
+            }
+
+            // تعديل الصلاحيات
+            if (dto.PermissionActionIds?.Any() == true)
+            {
+                unitOfWork.context.UserPermissions.RemoveRange(user.UserPermissions.ToList());
+
+                var newPermissions = dto.PermissionActionIds.Distinct()
+                    .Select(paId => new UserPermission
+                    {
+                        UserId = user.Id,
+                        PermissionActionId = paId
+                    });
+
+                await unitOfWork.UserPermissionRepo.AddRangeAsync(newPermissions);
+            }
+
+            await unitOfWork.SaveAsync();
+            return true;
+        }
+
+
     }
 }

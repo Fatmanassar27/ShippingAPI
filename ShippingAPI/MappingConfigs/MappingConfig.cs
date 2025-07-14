@@ -12,6 +12,7 @@ using ShippingAPI.DTOS.Permissions;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
 using ShippingAPI.DTOS.RejectionReasonDTOs;
+using ShippingAPI.DTOS.Reports;
 using ShippingAPI.DTOS.Reports.OrderDelivery;
 using ShippingAPI.DTOS.Saves;
 using ShippingAPI.DTOS.ShippingTypeDTOs;
@@ -258,8 +259,17 @@ namespace ShippingAPI.MappingConfigs
     .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
     .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
     .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true)); 
-
+    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
+            CreateMap<UpdateEmployeeDTO, ApplicationUser>()
+    .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.UserName))
+    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
+    .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+    .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
+            CreateMap<OrderStatusHistory, OrderStatusLogDto>()
+    .ForMember(dest => dest.OldStatus, opt => opt.MapFrom(src => src.OldStatus.ToString()))
+    .ForMember(dest => dest.NewStatus, opt => opt.MapFrom(src => src.NewStatus.ToString()))
+    .ForMember(dest => dest.ChangedBy, opt => opt.MapFrom(src => src.ChangedByUser.FullName));
         }
 
 

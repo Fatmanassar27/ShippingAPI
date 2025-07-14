@@ -7,6 +7,7 @@ using ShippingAPI.DTOS.courier;
 using ShippingAPI.DTOS.RejectionReasonDTOs;
 using ShippingAPI.Models;
 using ShippingAPI.UnitOfWorks;
+using System.Security.Claims;
 
 namespace ShippingAPI.Controllers
 {
@@ -282,23 +283,33 @@ namespace ShippingAPI.Controllers
             if (order == null)
                 return NotFound(new { message = "Order not found." });
 
-            // لو الحالة مرفوضة لازم سبب الرفض يبقى موجود
-            if ((dto.NewStatus == (int)OrderStatus.RejectedWithPayment ||
-                 dto.NewStatus == (int)OrderStatus.RejectedWithPartialPayment ||
-                 dto.NewStatus == (int)OrderStatus.RejectedWithoutPayment)
-                && dto.RejectionReasonId == null)
+            var oldStatus = order.Status;
+            var newStatus = (OrderStatus)dto.NewStatus;
+            if (oldStatus == newStatus)
             {
-                return BadRequest(new { message = "Rejection reason is required for rejected orders." });
+                return BadRequest(new { message = "The status is already the same." });
             }
-
-            // تحديث الحالة وسبب الرفض (لو موجود)
-            order.Status = (OrderStatus)dto.NewStatus;
+            order.Status = newStatus;
             if (dto.RejectionReasonId != null)
             {
                 order.RejectionReasonId = dto.RejectionReasonId;
             }
 
             uow.OrderRepo.edit(order);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var history = new OrderStatusHistory
+            {
+                OrderId = order.Id,
+                OldStatus = oldStatus,
+                NewStatus = newStatus,
+                ChangedByUserId = userId,
+                Notes = $"Status updated by courier {order.Status.ToString()}",
+                ChangedAt = DateTime.UtcNow
+            };
+
+            uow.context.OrderStatusHistories.Add(history);
+
             uow.save();
 
             return Ok(new { message = "Order status updated successfully." });

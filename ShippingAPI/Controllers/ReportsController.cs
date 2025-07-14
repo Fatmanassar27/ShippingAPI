@@ -21,5 +21,18 @@ namespace ShippingAPI.Controllers
             var result = await reportService.GetOrderReportAsync(request);
             return Ok(result);
         }
+        [HttpGet("order-status-history/{orderId}")]
+        public async Task<IActionResult> GetOrderStatusHistory(int orderId)
+        {
+            var logs = await reportService.GetOrderStatusLogsAsync(orderId);
+
+            if (logs == null || logs.Count == 0)
+            {
+                return NotFound($"No status logs found for order ID {orderId}.");
+            }
+
+            return Ok(logs);
+        }
+
     }
 }
