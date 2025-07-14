@@ -72,17 +72,66 @@ namespace ShippingAPI.Repositories
                 .ToList();
         }
 
+        //public decimal CalculateTotalCost(Order order)
+        //{
+        //    decimal totalCost = order.OrderCost;
+
+        //    if (order.DeliverToVillage)
+        //    {
+        //        var extra = db.ExtraVillagePrice.FirstOrDefault(p => p.IsActive);
+        //        if (extra != null)
+        //            totalCost += extra.Value;
+        //    }
+
+        //    var weight = db.Weights.FirstOrDefault();
+        //    if (weight != null && order.TotalWeight > (double)weight.Value)
+        //    {
+        //        var extraWeight = order.TotalWeight - (double)weight.Value;
+        //        totalCost += (decimal)extraWeight * weight.PricePerExtraKg;
+        //    }
+
+        //    return totalCost;
+        //}
+
+        //-------------------------------------------------
+
         public decimal CalculateTotalCost(Order order)
         {
             decimal totalCost = order.OrderCost;
 
+            // هشوف لو توصيل لقرية 
             if (order.DeliverToVillage)
             {
-                var extra = db.ExtraVillagePrice.FirstOrDefault(p => p.IsActive);
-                if (extra != null)
-                    totalCost += extra.Value;
+                var extraVillage = db.ExtraVillagePrice.FirstOrDefault(p => p.IsActive);
+                if (extraVillage != null)
+                    totalCost += extraVillage.Value;
             }
 
+            
+            var city = db.Cities.FirstOrDefault(c => c.Id == order.CityId);
+            var trader = db.TraderProfiles.FirstOrDefault(t => t.UserId == order.TraderId);
+
+            // هشوف لو عنده سعر خاص ليه لو لا هضيف بتاع المدينة دي عادي خالص
+            if (city != null)
+            {
+                decimal cityDeliveryCost = 0;
+
+                if (trader != null)
+                {
+                    var customCityPrice = db.CustomPrices
+                        .FirstOrDefault(p => p.TraderId == trader.UserId && p.CityId == city.Id);
+
+                    cityDeliveryCost = customCityPrice?.Price ?? city.PricePerKg;
+                }
+                else
+                {
+                    cityDeliveryCost = city.PricePerKg;
+                }
+
+                totalCost += cityDeliveryCost;
+            }
+
+            //  لو الوزن ازيد من القياسي
             var weight = db.Weights.FirstOrDefault();
             if (weight != null && order.TotalWeight > (double)weight.Value)
             {
@@ -90,8 +139,37 @@ namespace ShippingAPI.Repositories
                 totalCost += (decimal)extraWeight * weight.PricePerExtraKg;
             }
 
+            // لو هيروح يجيب الاوردر من عند التاجر وهشوف لو عنده سعر خاص بيه او اضيف بتاع المدينة 
+            if (order.DeliveryType == DeliveryType.FromMerchant)
+            {
+                if (trader != null)
+                {
+                    if (trader.CustomPickupCost > 0)
+                    {
+                        totalCost += trader.CustomPickupCost;
+                    }
+                    else if (city != null)
+                    {
+                        totalCost += city.PickupCost;
+                    }
+                }
+            }
+            var shippingType = db.ShippingTypes.FirstOrDefault(s => s.Id == order.ShippingTypeId);
+            if (shippingType != null)
+            {
+                totalCost += shippingType.AdditionalCost;
+            }
+
             return totalCost;
         }
+        public IQueryable<Order> GetQueryable()
+        {
+            return db.Orders.AsQueryable(); 
+        }
+
+
+
+
 
     }
 }
