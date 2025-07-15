@@ -49,6 +49,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles ="Trader")]
         public IActionResult addOrder(addOrderDTO orderDTO)
         {
             if (orderDTO == null)

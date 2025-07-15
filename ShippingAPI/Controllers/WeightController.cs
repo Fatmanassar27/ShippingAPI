@@ -10,7 +10,7 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")
+    [Authorize(Roles = "Admin")]
     public class WeightController : ControllerBase
     {
         UnitOfWork unit;

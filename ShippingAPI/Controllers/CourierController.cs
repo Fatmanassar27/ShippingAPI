@@ -243,7 +243,7 @@ namespace ShippingAPI.Controllers
 
 
         [HttpGet("courier-orders-display/{courierId}")]
-        [Authorize(Roles = "Admin,Trader,Courier")]
+        [Authorize(Roles = "Courier")]
         public IActionResult GetOrdersForCourierDisplay(string courierId)
         {
             var orders = uow.CourierProfileRepo.GetOrdersByCourierId(courierId);
