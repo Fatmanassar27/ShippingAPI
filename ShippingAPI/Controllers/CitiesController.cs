@@ -140,16 +140,26 @@ namespace ShippingAPI.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult deleteCity(int id)
         {
-            var city = uow.CityRepo.getById(id);
-            if (city == null)
+            try
             {
-                return NotFound("City not found");
+                var city = uow.CityRepo.getById(id);
+                if (city == null)
+                {
+                    return NotFound("City not found");
+                }
+
+                uow.cityRepo.delete(id);
+                uow.save();
+
+                return Ok(new { message = "City Deleted Successfully" });
             }
-            uow.cityRepo.delete(id);
-            uow.save();
-            return Ok(new { message = "City Deleted Successfully"});
-      
+            catch (Exception ex)
+            {
+                // ممكن نضيف لوج هنا لاحقًا
+                return BadRequest(new { message = "Can't delete this city because it has related data." });
+            }
         }
+
 
         [HttpGet("getbygovernorateid/{governorateId:int}")]
         [Authorize(Roles = "Admin,Trader,Courier")]

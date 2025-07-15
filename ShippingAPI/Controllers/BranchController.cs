@@ -113,21 +113,29 @@ namespace ShippingAPI.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
-            var branch =uow.BranchRepo.getById(id);
-            if (branch == null)
-                return NotFound();
-
-            var hasCouriers = uow.CourierBranchRepo.getAll().Any(cb => cb.BranchId == id);
-            if (hasCouriers)
+            try
             {
-                return BadRequest("Cannot delete this branch because it is assigned to one or more couriers.");
+                var branch = uow.BranchRepo.getById(id);
+                if (branch == null)
+                    return NotFound("Branch not found.");
+
+                var hasCouriers = uow.CourierBranchRepo.getAll().Any(cb => cb.BranchId == id);
+                if (hasCouriers)
+                {
+                    return BadRequest("Cannot delete this branch because it is assigned to one or more couriers.");
+                }
+
+                uow.branchRepo.Delete(id);
+                uow.save();
+
+                return Ok(new { message = "Branch deleted successfully." });
             }
-
-            uow.branchRepo.Delete(id);
-            uow.save();
-
-            return Ok();
+            catch (Exception ex)
+            {
+                return BadRequest("Unable to delete this branch because it has related data.");
+            }
         }
+
 
 
         [HttpGet("names")]
