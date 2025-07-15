@@ -79,25 +79,39 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
         {
             var user = mapper.Map<ApplicationUser>(model);
             var result = await userManager.CreateAsync(user, model.Password);
+
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 throw new ApplicationException($"Registration failed: {errors}");
             }
+
             if (!string.IsNullOrWhiteSpace(model.Role))
             {
                 var roleExists = await roleManager.RoleExistsAsync(model.Role);
-                if (roleExists)
-                    await userManager.AddToRoleAsync(user, model.Role);
+
+                if (!roleExists)
+                {
+                    // إنشاء الدور إذا لم يكن موجودًا
+                    var roleResult = await roleManager.CreateAsync(new IdentityRole(model.Role));
+                    if (!roleResult.Succeeded)
+                    {
+                        var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                        throw new ApplicationException($"Failed to create role: {errors}");
+                    }
+                }
+
+                // إضافة الدور للمستخدم
+                await userManager.AddToRoleAsync(user, model.Role);
             }
+
+            // إنشاء التوكن
             var token = GenerateToken(user);
             user.CurrentToken = token;
             user.TokenExpiration = DateTime.UtcNow.AddDays(7);
             await userManager.UpdateAsync(user);
 
             var roles = await userManager.GetRolesAsync(user);
-            var claims = await userManager.GetClaimsAsync(user);
-            var positionClaim = claims.FirstOrDefault(c => c.Type == "Position");
 
             return new UserProfileDTO
             {
@@ -110,6 +124,7 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                 TokenExpiration = user.TokenExpiration
             };
         }
+
 
         public async Task<List<string>> GetRolesAsync()
         {
