@@ -23,12 +23,7 @@ namespace ShippingAPI.DTOS.OrderDTOs
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public int? RejectionReasonId { get; set; }
-
-        //محافظة العميل 
         public int GovernorateId { get; set; }
-
-
-        //مدينة العميل 
         public int CityId { get; set; }
 
         public int? BranchId { get; set; }

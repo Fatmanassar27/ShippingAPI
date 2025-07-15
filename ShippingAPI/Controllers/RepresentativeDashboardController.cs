@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.InterfacesAndServices.Dashboard.Representative;
 using System.Security.Claims;
@@ -7,6 +8,8 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Courier")]
+
     public class RepresentativeDashboardController : ControllerBase
     {
         private readonly IRepresentativeDashboardService dashboardService;

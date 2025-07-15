@@ -8,11 +8,9 @@ namespace ShippingAPI.Models
         [Key]
         public int Id { get; set; }
 
-        // source
         public int? SourceBankId { get; set; }
         public int? SourceSafeId { get; set; }
 
-        //destination
         public int? DestinationBankId { get; set; }
         public int? DestinationSafeId { get; set; }
         public string? AdminId { get; set; }
@@ -24,8 +22,6 @@ namespace ShippingAPI.Models
 
         [StringLength(500)]
         public string? Note { get; set; }
-
-        //Navigation Properties
         [ForeignKey(nameof(AdminId))]
         public virtual ApplicationUser? Admin { get; set; }
 

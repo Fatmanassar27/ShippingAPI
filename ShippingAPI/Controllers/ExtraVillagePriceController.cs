@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.ExtraVillagePriceDTOs;
@@ -9,6 +10,7 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+   
     public class ExtraVillagePriceController : ControllerBase
     {
         private readonly UnitOfWork unit;
@@ -21,6 +23,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getAllُExtraPrices()
         {
             var prices = unit.ExtraVillagePriceRepo.getAll();
@@ -29,6 +32,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getExtraPriceById(int id)
         {
             var price = unit.ExtraVillagePriceRepo.getById(id);
@@ -38,6 +42,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult addExtraPrice(addExtraPriceDTO dto)
         {
             if (dto.IsActive)
@@ -55,6 +60,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult editExtraPrice(int id, addExtraPriceDTO dto)
         {
             var existing = unit.ExtraVillagePriceRepo.getById(id);
@@ -78,6 +84,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var price = unit.ExtraVillagePriceRepo.getById(id);

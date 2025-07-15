@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.OrderItemDTOs;
@@ -9,6 +10,7 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin,Trader,Courier")]
     public class OrderItemController : ControllerBase
     {
         private readonly UnitOfWork unit;
@@ -20,6 +22,7 @@ namespace ShippingAPI.Controllers
             this.mapper = mapper;
         }
         [HttpGet]
+
         public IActionResult getAllOrdersItems()
         {
             var orderItems = unit.OrderItemRepo.getAllOrderItemsWithOrder();

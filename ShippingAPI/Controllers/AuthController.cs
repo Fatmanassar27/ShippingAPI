@@ -19,7 +19,7 @@ namespace ShippingAPI.Controllers
             this.authService = authService;
         }
         [HttpPost("register")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterDTO model)
         {
             if (!ModelState.IsValid)
@@ -59,6 +59,7 @@ namespace ShippingAPI.Controllers
             return Ok(profile);
         }
         [HttpPost("register-employee")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RegisterEmployee([FromBody] RegisterEmployeeDTO dto)
         {
             if (!ModelState.IsValid)
@@ -79,12 +80,14 @@ namespace ShippingAPI.Controllers
             }
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllEmployeesWithPermissions()
         {
             var employees = await authService.GetAllEmployeesWithPermissionsAsync();
             return Ok(employees);
         }
         [HttpPut("toggle-status/{userId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ToggleEmployeeStatus(string userId, [FromQuery] bool isActive)
         {
             var result = await authService.ToggleEmployeeStatusAsync(userId, isActive);
@@ -94,7 +97,7 @@ namespace ShippingAPI.Controllers
             return Ok(new { message = $"Employee status updated to {(isActive ? "Active" : "Inactive")}" });
         }
         [HttpGet("employee/{userId}/permissions")]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetEmployeePermissions(string userId)
         {
             try

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.city_govern;
@@ -21,6 +22,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult GetCities()
         {
             var cities = uow.CityRepo.getAll();
@@ -34,6 +36,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getcitybyid(int id)
         {
             var city = uow.CityRepo.getById(id);
@@ -46,6 +49,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet("getcitybyname/{name}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getcitybyname(string name)
         {
             var city = uow.CityRepo.getByName(name);
@@ -58,6 +62,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult addCity(cityDTO cityDto)
         {
             if (!ModelState.IsValid)
@@ -82,6 +87,7 @@ namespace ShippingAPI.Controllers
 
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public IActionResult editCity(cityidDTO cityDto)
         {
             if (!ModelState.IsValid)
@@ -94,7 +100,6 @@ namespace ShippingAPI.Controllers
             {
                 return NotFound("City not found");
             }
-            // دوري على المدينة بالاسم
             var cityByName = uow.CityRepo.getByName(cityDto.Name);
             if (cityByName != null && cityByName.Id != cityDto.Id)
             {
@@ -106,19 +111,14 @@ namespace ShippingAPI.Controllers
             {
                 return BadRequest("Governorate not found");
             }
-
-            // ماب التعديلات على الكائن الموجود
             map.Map(cityDto, existingCity);
-
-            // اربطي الـ GovernorateId يدوي
             existingCity.GovernorateId = governorate.Id;
-
             uow.cityRepo.edit(existingCity);
             uow.save();
-
             return Ok(new { message = "City Updated Successfully" });
         }
         [HttpPut("togglestatusbyname/{name}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult ToggleCityStatusByName(string name)
         {
             var city = uow.CityRepo.getByName(name);
@@ -137,6 +137,7 @@ namespace ShippingAPI.Controllers
 
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult deleteCity(int id)
         {
             var city = uow.CityRepo.getById(id);
@@ -151,6 +152,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet("getbygovernorateid/{governorateId:int}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getByGovernorateId(int governorateId)
         {
             var cities = uow.CityRepo.getByGovernorateId(governorateId);

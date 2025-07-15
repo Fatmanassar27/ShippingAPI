@@ -1,14 +1,16 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.Attributes;
 using ShippingAPI.DTOS.Permissions;
 using ShippingAPI.Interfaces.Permissions;
+using System.Runtime.CompilerServices;
 
 namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class PermissionController : ControllerBase
     {
         private readonly IPermissionService _permissionService;

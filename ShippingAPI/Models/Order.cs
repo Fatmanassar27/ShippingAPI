@@ -14,13 +14,9 @@ namespace ShippingAPI.Models
         public string Email { get; set; }
         public string Phone1 { get; set; }
         public string Phone2 { get; set; }
-
-        //محافظة العميل 
         [ForeignKey("Governorate")]
         public int GovernorateId { get; set; }
         public virtual Governorate Governorate { get; set; }
-
-        //مدينة العميل 
         [ForeignKey("City")]
         public int CityId { get; set; }
         public virtual City City { get; set; }
@@ -42,16 +38,12 @@ namespace ShippingAPI.Models
         public string Notes { get; set; }
         public OrderStatus Status { get; set; } = OrderStatus.New;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
-
-        //تاجر 
         [ForeignKey("TraderProfile")]
         public string? TraderId { get; set; }
         public virtual TraderProfile? TraderProfile { get; set; }
-        //مندوب
         [ForeignKey("CourierProfile")]
         public string? CourierId { get; set; }
         public virtual CourierProfile? CourierProfile { get; set; }
-
         [ForeignKey("RejectionReason")]
         public int? RejectionReasonId { get; set; }
         public virtual RejectionReason RejectionReason { get; set; }
@@ -67,10 +59,10 @@ namespace ShippingAPI.Models
         Pending = 2,
         DeliveredToCourier = 3,
         Delivered = 4,
-        NotReachable = 5, //لا يمكن الوصول
-        Postponed = 6, //تم التأجيل
+        NotReachable = 5, 
+        Postponed = 6, 
         PartiallyDelivered = 7,
-        CancelledByRecipient = 8, //تم إلغاء الطلب من قبل المستلم
+        CancelledByRecipient = 8, 
         RejectedWithPayment = 9,
         RejectedWithPartialPayment = 10,
         RejectedWithoutPayment = 11
@@ -78,13 +70,13 @@ namespace ShippingAPI.Models
 
     public enum PaymentType
     {
-        CollectOnDelivery = 1,   // واجبة التحصيل
-        Prepaid = 2,              // دفع مقدم
-        ExchangePackage = 3      // طرد مقابل طرد
+        CollectOnDelivery = 1,  
+        Prepaid = 2,              
+        ExchangePackage = 3     
     }
     public enum DeliveryType
     {
-        AtBranch = 1,            // التسليم في الفرع
-        FromMerchant = 2         // تسليم من التاجر
+        AtBranch = 1,            
+        FromMerchant = 2         
     }
 }

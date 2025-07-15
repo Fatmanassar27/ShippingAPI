@@ -9,7 +9,7 @@
         public string Address { get; set; }
         public bool IsActive { get; set; }
         public List<string> Permissions { get; set; } = new();
-        public List<int> BranchIds { get; set; } = new();   // ✅ جديد
+        public List<int> BranchIds { get; set; } = new(); 
         public List<int> SafeIds { get; set; } = new();
 
     }

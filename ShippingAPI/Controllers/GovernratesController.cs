@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.city_govern;
@@ -9,6 +10,7 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class GovernratesController : ControllerBase
     {
         private readonly UnitOfWork uow;
@@ -21,6 +23,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult GetGovernrates()
         {
             var governrates = uow.GovernateRepo.getAll();
@@ -32,6 +35,7 @@ namespace ShippingAPI.Controllers
             return Ok(newGovernrates);
         }
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult GetGovernrateById(int id)
         {
             var governrate = uow.GovernateRepo.getById(id);
@@ -43,6 +47,7 @@ namespace ShippingAPI.Controllers
             return Ok(governrateDto);
         }
         [HttpGet("getgovernratebyname/{name}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult GetGovernrateByName(string name)
         {
             var governrate = uow.GovernateRepo.getByName(name);
@@ -54,6 +59,7 @@ namespace ShippingAPI.Controllers
             return Ok(governrateDto);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult AddGovernrate(governrateDTO governrateDto)
         {
             if (!ModelState.IsValid)
@@ -71,6 +77,7 @@ namespace ShippingAPI.Controllers
             return CreatedAtAction(nameof(GetGovernrateById), new { id = governrate.Id }, governrateDto);
         }
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public IActionResult UpdateGovernrate( governrateidDTO governrateDto)
         {
             if (!ModelState.IsValid)
@@ -94,6 +101,7 @@ namespace ShippingAPI.Controllers
 
         }
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult DeleteGovernrate(int id)
         {
             var governrate = uow.GovernateRepo.getById(id);
@@ -101,23 +109,17 @@ namespace ShippingAPI.Controllers
             {
                 return NotFound("The Governrate is not found.");
             }
-
-            // التحقق من وجود مندوب مرتبط بالمحافظة
             var hasCouriers = uow.CourierGovernorateRepo.getAll().Any(c => c.GovernorateId == id);
             if (hasCouriers)
             {
                 return BadRequest("Cannot delete this governorate because it's linked to one or more couriers.");
             }
-
-            // لو مفيش ارتباط، يتم الحذف
             uow.GovernateRepo.delete(id);
             uow.save();
             return Ok(new {message= "Governorate deleted successfully." });
         }
-
-
-
         [HttpGet("names")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getallgovernnames()
         {
             List<string> names = uow.GovernateRepo.getAll().Select(b => b.Name).ToList();

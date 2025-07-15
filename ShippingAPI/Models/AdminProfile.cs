@@ -11,7 +11,7 @@ namespace ShippingAPI.Models
         [ForeignKey("UserId")]
         public virtual ApplicationUser User { get; set; }
 
-        public string JobTitle { get; set; } // مثال: HR, Finance, SuperAdmin
+        public string JobTitle { get; set; } 
 
         public int AdminGroupId { get; set; }
 

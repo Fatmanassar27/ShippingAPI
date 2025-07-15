@@ -13,7 +13,6 @@ namespace ShippingAPI.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string? CurrentToken { get; set; }
         public DateTime? TokenExpiration { get; set; }
-        // Navigation
         public virtual AdminProfile AdminProfile { get; set; }
         public virtual TraderProfile TraderProfile { get; set; }
         public virtual CourierProfile CourierProfile { get; set; }

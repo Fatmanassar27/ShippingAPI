@@ -17,11 +17,9 @@ namespace ShippingAPI.Models
 
         [Column(TypeName = "Money")]
         public decimal PricePerKg { get; set; }
-        //  تكلفة البيك أب
         [Column(TypeName = "Money")]
         public decimal PickupCost { get; set; } = 0;
 
-        //  الحالة
         public bool IsActive { get; set; } = true;
         public virtual Governorate Governorate { get; set; } = null!;
         public virtual ICollection<Order> Orders { get; set; } = new List<Order>();

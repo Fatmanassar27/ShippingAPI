@@ -8,7 +8,7 @@ namespace ShippingAPI.Models
         [Key]
         public int Id { get; set; }
 
-        public string Name { get; set; } // HR - Accounting - SuperAdmin
+        public string Name { get; set; } 
 
         public virtual ICollection<AdminProfile> Admins { get; set; }
 

@@ -10,8 +10,6 @@ namespace ShippingAPI.Models
 
         [Column(TypeName = "Money")]
         public decimal Price { get; set; }
-
-        //تاجر 
         [ForeignKey("TraderProfile")]
         public string TraderId { get; set; }
         public virtual TraderProfile TraderProfile { get; set; }

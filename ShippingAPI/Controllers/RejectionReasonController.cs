@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.RejectionReasonDTOs;
@@ -21,6 +22,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Courier")]
         public IActionResult GetAllRejectionReasons()
         {
             var rejectionReasons = unit.RejectionReasonRepo.getAll();
@@ -33,6 +35,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Courier")]
         public IActionResult GetWeightById(int id)
         {
             var rejectionReason = unit.RejectionReasonRepo.getById(id);
@@ -45,6 +48,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult addeRejectionReason(addRejectionReasonDTO rejectionReasonDto)
         {
             if (rejectionReasonDto == null)
@@ -59,6 +63,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult updateRejectionReason(int id, addRejectionReasonDTO rejectionReasonDto)
         {
             if (rejectionReasonDto == null)
@@ -78,6 +83,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult deleteRejectionReason(int id)
         {
             var rejectionReason = unit.RejectionReasonRepo.getById(id);

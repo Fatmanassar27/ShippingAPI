@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost("create")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Createcourier([FromBody] CreateCourierDTO dto)
         {
             if (!ModelState.IsValid)
@@ -54,8 +56,6 @@ namespace ShippingAPI.Controllers
                     invalidGovernorateIds = invalidGovs
                 });
             }
-
-            // التحقق من الفروع (لو عايزة تضيفي كمان)
             var allBranches = uow.BranchRepo.getAll().Select(b => b.Id).ToList();
             var invalidBranches = dto.SelectedBranchIds.Except(allBranches).ToList();
 
@@ -116,6 +116,7 @@ namespace ShippingAPI.Controllers
 
 
         [HttpGet("getcouriers")]
+        [Authorize(Roles = "Admin,Trader")]
         public IActionResult GetCouriers()
         {
             var couriers = uow.CourierProfileRepo.getAllWithUser();
@@ -129,6 +130,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet("getcourierbyid/{id}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult GetCourierById(string id)
         {
             var courier = uow.CourierProfileRepo.getByIdWithUser(id);
@@ -141,6 +143,7 @@ namespace ShippingAPI.Controllers
             //return Ok(courier);
         }
         [HttpGet("getcourierbyname/{name}")]
+        [Authorize(Roles = "Admin,Trader")]
         public IActionResult GetCourierByName(string name)
         {
             var courier = uow.CourierProfileRepo.getcourierbyname(name);
@@ -153,6 +156,7 @@ namespace ShippingAPI.Controllers
             return Ok(courierDto);
         }
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public IActionResult UpdateCourier([FromBody] CreateCourierDTO courierdto)
         {
             if (!ModelState.IsValid)
@@ -190,6 +194,7 @@ namespace ShippingAPI.Controllers
 
         }
         [HttpDelete("delete/{courierId}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteCourier(string courierId)
         {
             var courierProfile = uow.CourierProfileRepo.getByIdWithUser(courierId);
@@ -222,8 +227,6 @@ namespace ShippingAPI.Controllers
                         return BadRequest(new { message = "Failed to remove user roles", errors = removeRolesResult.Errors });
                     }
                 }
-
-                // ثم نحذف المستخدم نفسه
                 var result = await usermanger.DeleteAsync(user);
                 if (!result.Succeeded)
                 {
@@ -235,20 +238,18 @@ namespace ShippingAPI.Controllers
 
             return Ok(new { message = "Courier deleted successfully" });
         }
-        //  كل الطلبات المرتبطة بكوريير معين
 
 
 
 
         [HttpGet("courier-orders-display/{courierId}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult GetOrdersForCourierDisplay(string courierId)
         {
             var orders = uow.CourierProfileRepo.GetOrdersByCourierId(courierId);
 
             if (orders == null || !orders.Any())
                 return NotFound(new { message = "No orders found for this courier." });
-
-            // استبعاد الحالات المرفوضة
             var filteredOrders = orders
                 .Where(order => order.Status != OrderStatus.RejectedWithPayment
                              && order.Status != OrderStatus.RejectedWithPartialPayment

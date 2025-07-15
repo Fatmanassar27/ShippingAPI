@@ -34,13 +34,9 @@ namespace ShippingAPI.Controllers
         {
             var question = request.Question.ToLower();
             string response;
-
-            // Check static/general answers from JSON
             response = await CheckStaticResponses(question);
             if (!string.IsNullOrEmpty(response))
                 return Ok(new { response });
-
-            // Handle dynamic responses based on database
             if (question.Contains("rejected"))
             {
                 var grouped = await _context.Orders

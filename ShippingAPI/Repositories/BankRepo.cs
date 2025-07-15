@@ -16,7 +16,7 @@ namespace ShippingAPI.Repositories
                 return new List<Bank>();
             }
             return db.Set<Bank>().AsNoTracking()
-                 .Where(b => b.Name.Contains(name)) // Case-insensitive search
+                 .Where(b => b.Name.Contains(name)) 
                  .ToList();
         }
     }

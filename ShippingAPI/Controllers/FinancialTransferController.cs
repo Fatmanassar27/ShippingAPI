@@ -11,6 +11,7 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class FinancialTransferController : ControllerBase
     {
         private readonly UnitOfWork unit;
@@ -26,10 +27,7 @@ namespace ShippingAPI.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
             var entity = mapper.Map<FinancialTransfer>(dto);
-
-            // Get the current admin ID from the token
             var adminId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             entity.AdminId = adminId;
 

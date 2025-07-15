@@ -92,7 +92,6 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
 
                 if (!roleExists)
                 {
-                    // إنشاء الدور إذا لم يكن موجودًا
                     var roleResult = await roleManager.CreateAsync(new IdentityRole(model.Role));
                     if (!roleResult.Succeeded)
                     {
@@ -101,11 +100,9 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                     }
                 }
 
-                // إضافة الدور للمستخدم
                 await userManager.AddToRoleAsync(user, model.Role);
             }
 
-            // إنشاء التوكن
             var token = GenerateToken(user);
             user.CurrentToken = token;
             user.TokenExpiration = DateTime.UtcNow.AddDays(7);
@@ -365,7 +362,6 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
             if (!result.Succeeded)
                 return false;
 
-            // تعديل الفروع BranchIds
             if (dto.BranchIds?.Any() == true)
             {
                 unitOfWork.context.EmployeeBranches.RemoveRange(user.EmployeeBranches.ToList());
@@ -380,7 +376,6 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                 await unitOfWork.EmployeeBranchRepo.AddRangeAsync(newBranches);
             }
 
-            // تعديل الخزن SafeIds
             if (dto.SafeIds?.Any() == true)
             {
                 unitOfWork.context.EmployeeSafes.RemoveRange(user.EmployeeSafes.ToList());
@@ -396,7 +391,6 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
                 await unitOfWork.EmployeeSafeRepo.AddRangeAsync(newSafes);
             }
 
-            // تعديل الصلاحيات
             if (dto.PermissionActionIds?.Any() == true)
             {
                 unitOfWork.context.UserPermissions.RemoveRange(user.UserPermissions.ToList());

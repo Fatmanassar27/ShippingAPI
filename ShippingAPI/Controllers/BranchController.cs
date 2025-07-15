@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult GetAllBranches()
         {
             var branches = uow.BranchRepo.getAll();
@@ -45,6 +47,7 @@ namespace ShippingAPI.Controllers
             return Ok(newbranch);
         }
         [HttpGet("getbranchbyname/{name}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult GetBranchByName(string name)
         {
             var branch = uow.BranchRepo.getByName(name);
@@ -56,6 +59,7 @@ namespace ShippingAPI.Controllers
             return Ok(newbranch);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult addbrach(branchDTO model)
         {
             if (!ModelState.IsValid)
@@ -74,6 +78,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         public IActionResult UpdateBranch(BranchIDdto model)
         {
             if (!ModelState.IsValid)
@@ -105,6 +110,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var branch =uow.BranchRepo.getById(id);

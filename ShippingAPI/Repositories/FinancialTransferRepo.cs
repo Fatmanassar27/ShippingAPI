@@ -18,7 +18,6 @@ namespace ShippingAPI.Repositories
             {
                 await db.FinancialTransfers.AddAsync(entity);
 
-                // خصم من المصدر
                 if (entity.SourceBankId.HasValue && entity.SourceBankId > 0)
                 {
                     var sourceBank = await db.Banks.FindAsync(entity.SourceBankId.Value);
@@ -32,7 +31,6 @@ namespace ShippingAPI.Repositories
                     sourceSafe.Balance -= entity.Amount;
                 }
 
-                // إضافة للوجهة
                 if (entity.DestinationBankId.HasValue && entity.DestinationBankId > 0)
                 {
                     var destBank = await db.Banks.FindAsync(entity.DestinationBankId.Value);

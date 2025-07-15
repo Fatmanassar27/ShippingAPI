@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ShippingAPI.DTOS.CustomPriceDTOs;
@@ -20,6 +21,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getAllCustomPrices() {
             var customPrices = unit.CustomPriceRepo.getAllWithObjs();
             if (customPrices == null || !customPrices.Any())
@@ -32,6 +34,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getCustomPriceById(int id)
         {
             var customPrice = unit.CustomPriceRepo.getByIdWithObjs(id);
@@ -45,6 +48,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet("byTraderId/{traderId}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getCustomPricesByTraderId(string traderId)
         {
             if (string.IsNullOrEmpty(traderId))
@@ -61,6 +65,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet("byCityId/{cityId}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getCustomPricesByCityId(int cityId)
         {
             if (cityId <= 0)
@@ -77,6 +82,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpGet("byCityName/{cityName}")]
+        [Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getCustomPricesByCityName(string cityName)
         {
             if (string.IsNullOrEmpty(cityName))
@@ -93,6 +99,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult addCustomPrice(addCustomPriceDTO customPriceDto)
         {
             if (customPriceDto == null)
@@ -116,6 +123,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost("Bulk")]
+        [Authorize(Roles = "Admin")]
         public IActionResult AddBulkCustomPrices(List<addCustomPriceDTO> customPriceDtos)
         {
             if (customPriceDtos == null || customPriceDtos.Count == 0)
@@ -142,6 +150,7 @@ namespace ShippingAPI.Controllers
 
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult updateCustomPrice(int id, addCustomPriceDTO customPriceDto)
         {
             if (customPriceDto == null || id <= 0)
@@ -161,6 +170,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult deleteCustomPrice(int id)
         {
             if (id <= 0)

@@ -22,7 +22,6 @@ namespace ShippingAPI.DTOS.TraderDTOs
         [Phone]
         public string Phone { get; set; }
 
-        // بيانات التاجر
         [Required]
         public string StoreName { get; set; }
 

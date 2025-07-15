@@ -72,34 +72,10 @@ namespace ShippingAPI.Repositories
                 .ToList();
         }
 
-        //public decimal CalculateTotalCost(Order order)
-        //{
-        //    decimal totalCost = order.OrderCost;
-
-        //    if (order.DeliverToVillage)
-        //    {
-        //        var extra = db.ExtraVillagePrice.FirstOrDefault(p => p.IsActive);
-        //        if (extra != null)
-        //            totalCost += extra.Value;
-        //    }
-
-        //    var weight = db.Weights.FirstOrDefault();
-        //    if (weight != null && order.TotalWeight > (double)weight.Value)
-        //    {
-        //        var extraWeight = order.TotalWeight - (double)weight.Value;
-        //        totalCost += (decimal)extraWeight * weight.PricePerExtraKg;
-        //    }
-
-        //    return totalCost;
-        //}
-
-        //-------------------------------------------------
 
         public decimal CalculateTotalCost(Order order)
         {
             decimal totalCost = order.OrderCost;
-
-            // هشوف لو توصيل لقرية 
             if (order.DeliverToVillage)
             {
                 var extraVillage = db.ExtraVillagePrice.FirstOrDefault(p => p.IsActive);
@@ -111,7 +87,7 @@ namespace ShippingAPI.Repositories
             var city = db.Cities.FirstOrDefault(c => c.Id == order.CityId);
             var trader = db.TraderProfiles.FirstOrDefault(t => t.UserId == order.TraderId);
 
-            // هشوف لو عنده سعر خاص ليه لو لا هضيف بتاع المدينة دي عادي خالص
+
             if (city != null)
             {
                 decimal cityDeliveryCost = 0;
