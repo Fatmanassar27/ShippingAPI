@@ -1,0 +1,22 @@
+[
+    {
+        "keywords": [ "importance of the system", "أهمية السيستم", "ليه نستخدم السيستم", "فائدة النظام" ],
+        "responseEn": "Our system improves the shipping process by managing orders, users, deliveries, and finances in one platform. It reduces errors and helps the company make better decisions.",
+        "responseAr": "نظامنا بيحسن عملية الشحن من خلال إدارة الطلبات، والمستخدمين، والتوصيل، والمعاملات المالية في منصة واحدة. وده بيقلل الأخطاء وبيساعد الشركة تاخد قرارات أفضل."
+    },
+    {
+        "keywords": [ "what does the system do", "وظيفة السيستم", "النظام بيعمل إيه", "system function" ],
+        "responseEn": "The system handles order management, courier tracking, payment handling, and financial reports. It supports roles like admin, courier, and trader.",
+        "responseAr": "النظام بيدير الطلبات، ويتابع المندوبين، ويحسب المدفوعات، ويصدر تقارير مالية. وبيوفر صلاحيات مختلفة زي المدير، المندوب، والتاجر."
+    },
+    {
+        "keywords": [ "features of the system", "مميزات النظام", "إمكانيات السيستم" ],
+        "responseEn": "Key features include:\n- Order tracking\n- Rejection analysis\n- Financial reports\n- Role-based access\n- AI integration",
+        "responseAr": "مميزات السيستم:\n- تتبع الطلبات\n- تحليل أسباب الرفض\n- تقارير مالية\n- صلاحيات مختلفة للمستخدمين\n- دمج مع الذكاء الاصطناعي"
+    },
+    {
+        "keywords": [ "technologies used", "التقنيات المستخدمة", "السيستم معمول بإيه", "بيشتغل بإيه" ],
+        "responseEn": "The system uses ASP.NET Core, Angular, SQL Server, and ML.NET for AI.",
+        "responseAr": "النظام مبني باستخدام ASP.NET Core، وAngular، وSQL Server، وبيستخدم ML.NET في الذكاء الاصطناعي."
+    }
+]
