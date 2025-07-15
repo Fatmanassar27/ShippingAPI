@@ -8,7 +8,7 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles ="Seller")]
+    [Authorize(Roles = "Trader")]
     public class SellerDashboardController : ControllerBase
     {
         private readonly ISellerDashboardService dashboardService;
