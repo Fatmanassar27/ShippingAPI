@@ -96,24 +96,32 @@ namespace ShippingAPI.Controllers
         [HttpDelete("{id:int}")]
         public IActionResult DeleteGovernrate(int id)
         {
-            var governrate = uow.GovernateRepo.getById(id);
-            if (governrate == null)
+            try
             {
-                return NotFound("The Governrate is not found.");
-            }
+                var governrate = uow.GovernateRepo.getById(id);
+                if (governrate == null)
+                {
+                    return NotFound("The governorate was not found.");
+                }
 
-            // التحقق من وجود مندوب مرتبط بالمحافظة
-            var hasCouriers = uow.CourierGovernorateRepo.getAll().Any(c => c.GovernorateId == id);
-            if (hasCouriers)
+                // Check if the governorate is linked to any couriers
+                var hasCouriers = uow.CourierGovernorateRepo.getAll().Any(c => c.GovernorateId == id);
+                if (hasCouriers)
+                {
+                    return BadRequest("Cannot delete this governorate because it is linked to one or more couriers.");
+                }
+
+                // Proceed with deletion if no relations exist
+                uow.GovernateRepo.delete(id);
+                uow.save();
+                return Ok(new { message = "Governorate deleted successfully." });
+            }
+            catch (Exception)
             {
-                return BadRequest("Cannot delete this governorate because it's linked to one or more couriers.");
+                return BadRequest("Unable to delete this governorate because it has related data.");
             }
-
-            // لو مفيش ارتباط، يتم الحذف
-            uow.GovernateRepo.delete(id);
-            uow.save();
-            return Ok(new {message= "Governorate deleted successfully." });
         }
+
 
 
 
