@@ -11,7 +11,8 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles ="Admin")]
+    //[Authorize(Roles ="Admin")]
+    //[Authorize(Roles ="Admin")]
     public class TraderController : ControllerBase
     {
         UnitOfWork unit;
@@ -30,7 +31,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost("RegisterTrader")]
-        public async Task<IActionResult> RegisterTrader(RegisterTraderDTO dto)
+        public async Task<IActionResult> RegisterTrader([FromBody] RegisterTraderDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

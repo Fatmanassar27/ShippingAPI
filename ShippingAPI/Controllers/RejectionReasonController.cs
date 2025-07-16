@@ -93,7 +93,7 @@ namespace ShippingAPI.Controllers
             }
             unit.RejectionReasonRepo.delete(id);
             unit.save();
-            return Ok($"RejectionReason with ID {id} deleted successfully.");
+            return Ok(new { message = "RejectionReason deleted successfully." });
 
         }
 

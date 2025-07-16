@@ -62,7 +62,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public IActionResult addCity(cityDTO cityDto)
         {
             if (!ModelState.IsValid)

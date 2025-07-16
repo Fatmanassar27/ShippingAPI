@@ -40,21 +40,24 @@ namespace ShippingAPI.Controllers
             if (question.Contains("rejected"))
             {
                 var grouped = await _context.Orders
-                    .Where(o => o.Status == OrderStatus.RejectedWithoutPayment
-                             || o.Status == OrderStatus.RejectedWithPartialPayment
-                             || o.Status == OrderStatus.RejectedWithPayment)
-                    .GroupBy(o => o.RejectionReason)
-                    .Select(g => new { Reason = g.Key, Count = g.Count() })
-                    .ToListAsync();
+               .Where(o => o.Status == OrderStatus.RejectedWithoutPayment
+                        || o.Status == OrderStatus.RejectedWithPartialPayment
+                        || o.Status == OrderStatus.RejectedWithPayment)
+               .Include(o => o.RejectionReason) // نجيب كائن السبب نفسه
+               .Select(o => new { o.RejectionReason.Reason , o.RejectionReasonId  } )
+               .GroupBy(o => o.Reason != null ? o.Reason : "Unknown Reason")
+               .Select(g => new { Reason = g.Key, Count = g.Count() })
+               .ToListAsync();
+
 
                 response = grouped.Count == 0
                     ? "There are no rejected orders at the moment."
                     : "Rejected Orders:\n" + string.Join("\n", grouped.Select(g =>
-                        $"{g.Count} orders were rejected due to: {g.Reason}"));
+                        $"{g.Count} orders were rejected due to : {g.Reason}"));
             }
             else if (question.Contains("orders") && question.Contains("in delivery"))
             {
-                var count = await _context.Orders.CountAsync(o => o.Status == OrderStatus.PartiallyDelivered);
+                var count = await _context.Orders.CountAsync(o => o.Status == OrderStatus.Delivered);
                 response = $"There are currently {count} orders in delivery.";
             }
             else

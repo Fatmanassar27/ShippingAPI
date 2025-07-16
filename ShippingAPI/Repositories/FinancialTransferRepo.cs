@@ -10,38 +10,120 @@ namespace ShippingAPI.Repositories
         {
         }
 
-
         public async Task<bool> AddTransferAsync(FinancialTransfer entity)
         {
             using var transaction = await db.Database.BeginTransactionAsync();
             try
             {
-                await db.FinancialTransfers.AddAsync(entity);
+                entity.Date = DateTime.Now;
 
-                if (entity.SourceBankId.HasValue && entity.SourceBankId > 0)
-                {
-                    var sourceBank = await db.Banks.FindAsync(entity.SourceBankId.Value);
-                    if (sourceBank == null) throw new Exception("Source bank not found.");
-                    sourceBank.Balance -= entity.Amount;
-                }
-                else if (entity.SourceSafeId.HasValue && entity.SourceSafeId > 0)
+                bool isSafeToSafe = entity.SourceSafeId != null && entity.DestinationSafeId != null;
+                bool isBankToBank = entity.SourceBankId != null && entity.DestinationBankId != null;
+
+                if (isSafeToSafe)
                 {
                     var sourceSafe = await db.Safes.FindAsync(entity.SourceSafeId.Value);
-                    if (sourceSafe == null) throw new Exception("Source safe not found.");
-                    sourceSafe.Balance -= entity.Amount;
-                }
-
-                if (entity.DestinationBankId.HasValue && entity.DestinationBankId > 0)
-                {
-                    var destBank = await db.Banks.FindAsync(entity.DestinationBankId.Value);
-                    if (destBank == null) throw new Exception("Destination bank not found.");
-                    destBank.Balance += entity.Amount;
-                }
-                else if (entity.DestinationSafeId.HasValue && entity.DestinationSafeId > 0)
-                {
                     var destSafe = await db.Safes.FindAsync(entity.DestinationSafeId.Value);
-                    if (destSafe == null) throw new Exception("Destination safe not found.");
+
+                    if (sourceSafe == null || destSafe == null)
+                        throw new Exception("Safe not found.");
+
+                    if (sourceSafe.Balance < entity.Amount)
+                        throw new Exception("Insufficient balance in source safe.");
+
+                    sourceSafe.Balance -= entity.Amount;
                     destSafe.Balance += entity.Amount;
+
+                    // سجلين: خصم و إضافة
+                    var fromSafe = new FinancialTransfer
+                    {
+                        SourceSafeId = entity.SourceSafeId,
+                        Amount = entity.Amount,
+                        Note = $"Transfer to Safe {entity.DestinationSafeId}",
+                        AdminId = entity.AdminId,
+                        Date = entity.Date
+                    };
+
+                    var toSafe = new FinancialTransfer
+                    {
+                        DestinationSafeId = entity.DestinationSafeId,
+                        Amount = entity.Amount,
+                        Note = $"Transfer from Safe {entity.SourceSafeId}",
+                        AdminId = entity.AdminId,
+                        Date = entity.Date
+                    };
+
+                    await db.FinancialTransfers.AddRangeAsync(fromSafe, toSafe);
+                }
+                else if (isBankToBank)
+                {
+                    var sourceBank = await db.Banks.FindAsync(entity.SourceBankId.Value);
+                    var destBank = await db.Banks.FindAsync(entity.DestinationBankId.Value);
+
+                    if (sourceBank == null || destBank == null)
+                        throw new Exception("Bank not found.");
+
+                    if (sourceBank.Balance < entity.Amount)
+                        throw new Exception("Insufficient balance in source bank.");
+
+                    sourceBank.Balance -= entity.Amount;
+                    destBank.Balance += entity.Amount;
+
+                    // سجلين: خصم و إضافة
+                    var fromBank = new FinancialTransfer
+                    {
+                        SourceBankId = entity.SourceBankId,
+                        Amount = entity.Amount,
+                        Note = $"Transfer to Bank {entity.DestinationBankId}",
+                        AdminId = entity.AdminId,
+                        Date = entity.Date
+                    };
+
+                    var toBank = new FinancialTransfer
+                    {
+                        DestinationBankId = entity.DestinationBankId,
+                        Amount = entity.Amount,
+                        Note = $"Transfer from Bank {entity.SourceBankId}",
+                        AdminId = entity.AdminId,
+                        Date = entity.Date
+                    };
+
+                    await db.FinancialTransfers.AddRangeAsync(fromBank, toBank);
+                }
+                else
+                {
+                    // تحويل عادي أو إيداع أو سحب
+                    if (entity.SourceSafeId.HasValue)
+                    {
+                        var sourceSafe = await db.Safes.FindAsync(entity.SourceSafeId.Value);
+                        if (sourceSafe == null) throw new Exception("Source safe not found.");
+                        if (sourceSafe.Balance < entity.Amount) throw new Exception("Insufficient balance.");
+                        sourceSafe.Balance -= entity.Amount;
+                    }
+
+                    if (entity.DestinationSafeId.HasValue)
+                    {
+                        var destSafe = await db.Safes.FindAsync(entity.DestinationSafeId.Value);
+                        if (destSafe == null) throw new Exception("Destination safe not found.");
+                        destSafe.Balance += entity.Amount;
+                    }
+
+                    if (entity.SourceBankId.HasValue)
+                    {
+                        var sourceBank = await db.Banks.FindAsync(entity.SourceBankId.Value);
+                        if (sourceBank == null) throw new Exception("Source bank not found.");
+                        if (sourceBank.Balance < entity.Amount) throw new Exception("Insufficient balance.");
+                        sourceBank.Balance -= entity.Amount;
+                    }
+
+                    if (entity.DestinationBankId.HasValue)
+                    {
+                        var destBank = await db.Banks.FindAsync(entity.DestinationBankId.Value);
+                        if (destBank == null) throw new Exception("Destination bank not found.");
+                        destBank.Balance += entity.Amount;
+                    }
+
+                    await db.FinancialTransfers.AddAsync(entity);
                 }
 
                 await db.SaveChangesAsync();
@@ -54,7 +136,9 @@ namespace ShippingAPI.Repositories
                 return false;
             }
         }
-        public List<FinancialTransfer> GetBankTransfersFiltered( string? bankName = null, DateTime? startDate = null, DateTime? endDate = null)
+
+
+        public List<FinancialTransfer> GetBankTransfersFiltered(string? bankName = null, DateTime? startDate = null, DateTime? endDate = null)
         {
             var transfers = db.FinancialTransfers.Include(t => t.SourceBank)
                 .Include(t => t.DestinationBank)
@@ -104,6 +188,5 @@ namespace ShippingAPI.Repositories
 
             return transfers.OrderByDescending(t => t.Date).ToList();
         }
-
     }
 }

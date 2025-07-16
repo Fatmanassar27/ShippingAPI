@@ -12,7 +12,7 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles ="Admin")]
+    //[Authorize(Roles ="Admin,Trader")]
     public class ShippingTypeController : ControllerBase
     {
 

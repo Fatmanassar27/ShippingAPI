@@ -11,7 +11,7 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin,Trader,Courier")]
+    //[Authorize(Roles = "Admin,Trader,Courier")]
     public class OrderController : ControllerBase
     {
         IMapper mapper;
@@ -49,7 +49,7 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles ="Trader")]
+        //[Authorize(Roles ="Trader")]
         public IActionResult addOrder(addOrderDTO orderDTO)
         {
             if (orderDTO == null)

@@ -10,7 +10,7 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin,Trader")]
     public class GovernratesController : ControllerBase
     {
         private readonly UnitOfWork uow;
@@ -133,7 +133,7 @@ namespace ShippingAPI.Controllers
 
 
         [HttpGet("names")]
-        [Authorize(Roles = "Admin,Trader,Courier")]
+        //[Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getallgovernnames()
         {
             List<string> names = uow.GovernateRepo.getAll().Select(b => b.Name).ToList();
