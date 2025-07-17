@@ -112,14 +112,12 @@ namespace ShippingAPI.Controllers
                     return NotFound("The governorate was not found.");
                 }
 
-                // Check if the governorate is linked to any couriers
                 var hasCouriers = uow.CourierGovernorateRepo.getAll().Any(c => c.GovernorateId == id);
                 if (hasCouriers)
                 {
                     return BadRequest("Cannot delete this governorate because it is linked to one or more couriers.");
                 }
 
-                // Proceed with deletion if no relations exist
                 uow.GovernateRepo.delete(id);
                 uow.save();
                 return Ok(new { message = "Governorate deleted successfully." });
@@ -133,7 +131,6 @@ namespace ShippingAPI.Controllers
 
 
         [HttpGet("names")]
-        //[Authorize(Roles = "Admin,Trader,Courier")]
         public IActionResult getallgovernnames()
         {
             List<string> names = uow.GovernateRepo.getAll().Select(b => b.Name).ToList();

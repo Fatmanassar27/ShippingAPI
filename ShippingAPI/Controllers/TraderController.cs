@@ -11,8 +11,6 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles ="Admin")]
-    //[Authorize(Roles ="Admin")]
     public class TraderController : ControllerBase
     {
         UnitOfWork unit;
@@ -107,19 +105,6 @@ namespace ShippingAPI.Controllers
             var result = mapper.Map<TraderProfileDTO>(trader);
             return Ok(result);
         }
-
-        //[HttpPut("{id}")]
-        //public IActionResult editTrader(string id, UpdateTraderDTO dto)
-        //{
-        //    var trader = unit.TraderProfileRepo.getByIdWithUser(id);
-        //    if (trader == null)
-        //        return NotFound("Trader not found." );
-
-        //    mapper.Map(dto, trader);
-        //    unit.TraderProfileRepo.edit(trader);
-        //    unit.save();
-        //    return Ok("Trader updated successfully.");
-        //}
 
         [HttpPut("{id}")]
         public IActionResult editTrader(string id, UpdateTraderDTO dto)

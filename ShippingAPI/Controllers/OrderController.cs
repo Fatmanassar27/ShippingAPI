@@ -11,7 +11,6 @@ namespace ShippingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(Roles = "Admin,Trader,Courier")]
     public class OrderController : ControllerBase
     {
         IMapper mapper;
@@ -49,7 +48,6 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles ="Trader")]
         public IActionResult addOrder(addOrderDTO orderDTO)
         {
             if (orderDTO == null)
@@ -81,7 +79,6 @@ namespace ShippingAPI.Controllers
             var oldStatus = order.Status;
             mapper.Map(orderDTO, order);
 
-            // ✳️ جيب الـ UserId من الـ Claims
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (order.Status != oldStatus)

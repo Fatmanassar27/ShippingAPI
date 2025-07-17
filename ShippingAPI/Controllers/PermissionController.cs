@@ -112,14 +112,5 @@ namespace ShippingAPI.Controllers
             return result is null ? NotFound("Permission not found") : Ok(result);
         }
 
-        [HttpGet("secure")]
-        [PermissionAuthorize("ManagerOfOrders")]
-        public IActionResult TestSecure()
-        {
-            return Ok("✔ Authorized to manage orders.");
-        }
-
-
-
     }
 }

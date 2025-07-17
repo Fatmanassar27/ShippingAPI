@@ -106,16 +106,12 @@ namespace ShippingAPI.Repositories
 
                 totalCost += cityDeliveryCost;
             }
-
-            //  لو الوزن ازيد من القياسي
             var weight = db.Weights.FirstOrDefault();
             if (weight != null && order.TotalWeight > (double)weight.Value)
             {
                 var extraWeight = order.TotalWeight - (double)weight.Value;
                 totalCost += (decimal)extraWeight * weight.PricePerExtraKg;
             }
-
-            // لو هيروح يجيب الاوردر من عند التاجر وهشوف لو عنده سعر خاص بيه او اضيف بتاع المدينة 
             if (order.DeliveryType == DeliveryType.FromMerchant)
             {
                 if (trader != null)

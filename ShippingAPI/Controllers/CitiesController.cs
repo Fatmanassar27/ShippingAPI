@@ -62,7 +62,6 @@ namespace ShippingAPI.Controllers
         }
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
         public IActionResult addCity(cityDTO cityDto)
         {
             if (!ModelState.IsValid)
@@ -155,7 +154,6 @@ namespace ShippingAPI.Controllers
             }
             catch (Exception ex)
             {
-                // ممكن نضيف لوج هنا لاحقًا
                 return BadRequest(new { message = "Can't delete this city because it has related data." });
             }
         }

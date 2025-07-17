@@ -420,6 +420,27 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
             var result = await userManager.UpdateAsync(user);
             return result.Succeeded;
         }
+        public async Task<bool> UpdateEmployeePermissionsAsync(string userId, List<int> permissionIds)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+                return false;
+            var existingPermissions = await unitOfWork.UserPermissionRepo
+                .FindAsync(up => up.UserId == userId);
+            unitOfWork.context.UserPermissions.RemoveRange(existingPermissions);
+            var permissionActions = await unitOfWork.PermissionActionRepo
+                .WhereAsync(pa => permissionIds.Contains(pa.PermissionId));
+
+            var newUserPermissions = permissionActions.Select(pa => new UserPermission
+            {
+                UserId = userId,
+                PermissionActionId = pa.Id
+            });
+            await unitOfWork.UserPermissionRepo.AddRangeAsync(newUserPermissions);
+            await unitOfWork.SaveAsync();
+
+            return true;
+        }
 
 
     }

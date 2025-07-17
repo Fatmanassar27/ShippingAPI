@@ -126,7 +126,6 @@ namespace ShippingAPI.Controllers
             }
             var courierDtos = mapper.Map<List<displaycourier>>(couriers); 
             return Ok(courierDtos);
-            //return Ok(couriers);
         }
 
         [HttpGet("getcourierbyid/{id}")]
@@ -140,7 +139,6 @@ namespace ShippingAPI.Controllers
             }
             var courierDtos = mapper.Map<CreateCourierDTO>(courier);
             return Ok(courierDtos);
-            //return Ok(courier);
         }
         [HttpGet("getcourierbyname/{name}")]
         [Authorize(Roles = "Admin,Trader")]
@@ -151,7 +149,6 @@ namespace ShippingAPI.Controllers
             {
                 return NotFound("The Courier Is Not Found");
             }
-            //return Ok(courier);
             var courierDto = mapper.Map<CreateCourierDTO>(courier); 
             return Ok(courierDto);
         }
@@ -168,14 +165,12 @@ namespace ShippingAPI.Controllers
             {
                 return NotFound("The Courier Is Not Found");
             }
-            // Update the courier's properties
             existingCourier.User.Email = courierdto.Email;
             existingCourier.User.Address = courierdto.Address;
             existingCourier.User.PhoneNumber = courierdto.PhoneNumber;
             existingCourier.User.FullName = courierdto.FullName;
             existingCourier.DiscountType = courierdto.DiscountType;
             existingCourier.OrderShare = courierdto.OrderShare;
-            // Update Governorates and Branches
             existingCourier.CourierGovernorates.Clear();
             existingCourier.CourierGovernorates = courierdto.SelectedGovernorateIds.Select(govId => new CourierGovernorate
             {
@@ -315,11 +310,6 @@ namespace ShippingAPI.Controllers
 
             return Ok(new { message = "Order status updated successfully." });
         }
-
-
-
-
-        // الطلبات المرفوضة فقط الخاصة بكوريير معين
         [HttpGet("rejected-orders/{courierId}")]
         public IActionResult GetRejectedOrdersByCourierId(string courierId)
         {
@@ -346,9 +336,6 @@ namespace ShippingAPI.Controllers
 
             return Ok(result);
         }
-
-
-        // جميع أسباب الرفض المتاحة
         [HttpGet("rejection-reasons")]
         public IActionResult GetRejectionReasons()
         {

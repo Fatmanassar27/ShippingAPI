@@ -15,7 +15,7 @@ namespace ShippingAPI.Repositories
                 return new List<Safe>();
             }
             return db.Set<Safe>().AsNoTracking()
-                 .Where(b => b.Name.Contains(name)) // Case-insensitive search
+                 .Where(b => b.Name.Contains(name)) 
                  .ToList();
         }
     }

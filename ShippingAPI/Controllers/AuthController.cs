@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ShippingAPI.DTOS.Employee;
+using ShippingAPI.DTOS.Permissions;
 using ShippingAPI.DTOS.Register;
 using ShippingAPI.DTOS.RegisterAndLogin;
 using ShippingAPI.Interfaces.LoginAndRegister;
@@ -97,7 +99,6 @@ namespace ShippingAPI.Controllers
             return Ok(new { message = $"Employee status updated to {(isActive ? "Active" : "Inactive")}" });
         }
         [HttpGet("employee/{userId}/permissions")]
-        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetEmployeePermissions(string userId)
         {
             try
@@ -125,6 +126,44 @@ namespace ShippingAPI.Controllers
                 return BadRequest("Logout failed");
 
             return Ok(new { message = "Logout successful" });
+        }
+        [HttpPut("update-employee")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateEmployee([FromBody] UpdateEmployeeDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                var error = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .FirstOrDefault();
+
+                return BadRequest(new { message = error ?? "Invalid input" });
+            }
+
+            try
+            {
+                var result = await authService.UpdateEmployeeAsync(dto);
+                if (!result)
+                    return NotFound(new { message = "Employee not found" });
+
+                return Ok(new { message = "Employee updated successfully" });
+            }
+            catch (ApplicationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred", details = ex.Message });
+            }
+        }
+        [HttpPut("update-employee-permissions")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateEmployeePermissions([FromBody] UpdateEmployeePermissionsDTO dto)
+        {
+            var result = await authService.UpdateEmployeePermissionsAsync(dto.UserId, dto.PermissionIds);
+            return result ? Ok(new { message = "Permissions updated." }) : BadRequest("Failed to update permissions.");
         }
 
     }

@@ -67,7 +67,6 @@ namespace ShippingAPI
                 options.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("Shipping")));
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
-
             builder.Services.AddScoped<UnitOfWork>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IPermissionService, PermissionService>();
@@ -75,16 +74,10 @@ namespace ShippingAPI
             builder.Services.AddScoped<ISellerDashboardService, SellerDashboardService>();
             builder.Services.AddScoped<IRepresentativeDashboardService, RepresentativeDashboardService>();
             builder.Services.AddScoped<IReportService, ReportService>();
-            //builder.Services.AddScoped<IAuthService,AuthService>();
             builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 
             var app = builder.Build();
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var serviceProvider = scope.ServiceProvider;
-            //    await SeedRolesAsync(serviceProvider);
-            //}
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -103,19 +96,5 @@ namespace ShippingAPI
 
             app.Run();
         }
-        //static async Task SeedRolesAsync(IServiceProvider serviceProvider)
-        //{
-        //    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-        //    string[] roles = { "Admin", "Seller", "Representative", "Employee" };
-
-        //    foreach (var role in roles)
-        //    {
-        //        if (!await roleManager.RoleExistsAsync(role))
-        //        {
-        //            await roleManager.CreateAsync(new IdentityRole(role));
-        //        }
-        //    }
-        //}
     }
 }

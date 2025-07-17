@@ -137,7 +137,6 @@ namespace ShippingAPI.MappingConfigs
             .ForMember(dest => dest.AdminName, opt => opt.MapFrom(src => src.Admin.FullName != null ? src.Admin.FullName : ""))
             .ForMember(dest => dest.Debit, opt => opt.MapFrom(src => src.SourceSafeId != null ? src.Amount : 0));
             CreateMap<City, cityDTO>().ReverseMap();
-            //  .ForMember(dest => dest.GoverrateName, opt => opt.MapFrom(src => src.Governorate.Name))
             CreateMap<City, cityidDTO>()
                 .ForMember(dest => dest.GoverrateName, opt => opt.MapFrom(src => src.Governorate.Name))
                 .ReverseMap();

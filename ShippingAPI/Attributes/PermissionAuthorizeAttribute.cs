@@ -30,7 +30,6 @@ namespace ShippingAPI.Attributes
             {
                 UserId = userId,
                 PermissionName = _permissionName
-                // بدون ActionTypeId
             });
 
             if (!hasPermission)

@@ -65,22 +65,6 @@ namespace ShippingAPI.Controllers
             displayWeightDTO result = mapper.Map<displayWeightDTO>(weight);
             return Ok(result);
         }
-
-
-        //[HttpPost]
-        //public IActionResult addeWeight(addWeightDTO weightDto)
-        //{
-        //    if (weightDto == null)
-        //    {
-        //        return BadRequest("Weight data is null.");
-        //    }
-        //    var weight = mapper.Map<Weight>(weightDto);
-        //    unit.WeightRepo.add(weight);
-        //    unit.save();
-        //    displayWeightDTO result = mapper.Map<displayWeightDTO>(weight);
-        //    return Ok(result);
-        //}
-
         [HttpPut("{id}")]
         public IActionResult updateWeight(int id, addWeightDTO weightDto)
         {

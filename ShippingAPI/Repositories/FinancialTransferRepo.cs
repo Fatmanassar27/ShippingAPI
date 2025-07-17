@@ -34,7 +34,6 @@ namespace ShippingAPI.Repositories
                     sourceSafe.Balance -= entity.Amount;
                     destSafe.Balance += entity.Amount;
 
-                    // سجلين: خصم و إضافة
                     var fromSafe = new FinancialTransfer
                     {
                         SourceSafeId = entity.SourceSafeId,
@@ -69,7 +68,6 @@ namespace ShippingAPI.Repositories
                     sourceBank.Balance -= entity.Amount;
                     destBank.Balance += entity.Amount;
 
-                    // سجلين: خصم و إضافة
                     var fromBank = new FinancialTransfer
                     {
                         SourceBankId = entity.SourceBankId,
@@ -92,7 +90,6 @@ namespace ShippingAPI.Repositories
                 }
                 else
                 {
-                    // تحويل عادي أو إيداع أو سحب
                     if (entity.SourceSafeId.HasValue)
                     {
                         var sourceSafe = await db.Safes.FindAsync(entity.SourceSafeId.Value);

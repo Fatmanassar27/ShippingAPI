@@ -16,7 +16,7 @@ namespace ShippingAPI.Interfaces.LoginAndRegister
         Task<bool> UpdateEmployeeAsync(UpdateEmployeeDTO dto);
         Task<bool> LogoutAsync(string userId);
 
-
+        Task<bool> UpdateEmployeePermissionsAsync(string userId, List<int> permissionIds);
 
     }
 }
